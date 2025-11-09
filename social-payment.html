@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Media Payment</title>
+<style>
+  body { font-family:'Poppins', sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+  .payment-container { background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.1); max-width:400px; width:90%; }
+  h2 { margin-top:0; color:#ff2d55; }
+  .order-summary { margin:1rem 0; border-top:1px solid #eee; padding-top:1rem; }
+  .order-summary div { margin-bottom:8px; }
+  .btn-pay { background:#0a84ff; color:#fff; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-size:16px; width:100%; transition:0.3s; }
+  .btn-pay:hover { background:#0066cc; }
+</style>
+</head>
+<body>
+
+<div class="payment-container">
+  <h2>Confirm Your Order</h2>
+  <div class="order-summary">
+    <div><strong>Platform:</strong> <span id="platform"></span></div>
+    <div><strong>Service:</strong> <span id="service"></span></div>
+    <div><strong>Quantity:</strong> <span id="quantity"></span></div>
+    <div><strong>Account Link:</strong> <span id="account"></span></div>
+    <div><strong>Total Price:</strong> $<span id="total"></span></div>
+  </div>
+  <button class="btn-pay" id="payButton">Pay Now</button>
+</div>
+
+<script>
+// Function to get URL query parameters
+function getQueryParams() {
+  const params = {};
+  const queryString = window.location.search.slice(1);
+  queryString.split("&").forEach(pair => {
+    const [key, value] = pair.split("=");
+    params[key] = decodeURIComponent(value || "");
+  });
+  return params;
+}
+
+// Populate order summary
+const params = getQueryParams();
+document.getElementById('platform').textContent = params.platform || '';
+document.getElementById('service').textContent = params.service || '';
+document.getElementById('quantity').textContent = params.quantity || '';
+document.getElementById('account').textContent = params.account || '';
+document.getElementById('total').textContent = params.total || '0';
+
+// Payment button click
+document.getElementById('payButton').addEventListener('click', () => {
+  // Redirect to your payment processor
+  // Example: PayPal checkout page or Stripe payment link
+  // Here we just alert for demonstration
+  alert(`Redirecting to payment for $${params.total}`);
+  // Example redirect (replace with your real payment link)
+  // window.location.href = `https://www.paypal.com/pay?amount=${params.total}`;
+});
+</script>
+
+</body>
+</html>

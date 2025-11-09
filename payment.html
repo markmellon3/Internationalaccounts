@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Payment — SocialAccounts</title>
+<style>
+:root {
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --accent:#0a84ff;
+  --muted:#6b7280;
+  --radius:12px;
+}
+body{font-family:system-ui,Segoe UI,Roboto,Arial; background:var(--bg); margin:0; padding:28px;}
+.container{max-width:620px;margin:28px auto;background:var(--card);padding:22px;border-radius:var(--radius);box-shadow:0 6px 20px rgba(11,18,32,0.06);}
+h1{margin:0 0 10px;color:var(--accent)}
+.meta{color:var(--muted);margin-bottom:12px;}
+.row{display:flex;gap:12px;align-items:center;}
+input,textarea,select{width:100%;padding:10px;border:1px solid #e6e9ee;border-radius:8px;font-size:15px}
+label{font-weight:600;font-size:14px;margin-top:10px;display:block;color:#222}
+.pay-btn{background:var(--accent);color:#fff;border:0;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px}
+.pay-btn[aria-hidden="true"]{display:none}
+.confirm-btn{background:#16a34a;color:#fff;border:0;padding:12px;border-radius:10px;font-weight:700;cursor:not-allowed;opacity:0.5;margin-top:12px}
+.confirm-btn.active{cursor:pointer;opacity:1}
+.secondary{background:#e6e6e6;color:#111;border:0;padding:10px;border-radius:10px;cursor:pointer;margin-top:10px}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.bad{color:#b91c1c;font-weight:700}
+.success{color:#16a34a;font-weight:700}
+.hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="container" id="app">
+    <h1>Complete Payment</h1>
+    <div id="details" class="meta">Loading account details…</div>
+
+    <label for="buyerName">Full name</label>
+    <input id="buyerName" placeholder="Your full name" />
+
+    <label for="buyerContact">Email or WhatsApp number</label>
+    <input id="buyerContact" placeholder="e.g. you@mail.com or +2567XXXXXXXX" />
+
+    <label for="buyerNote">Optional note</label>
+    <textarea id="buyerNote" placeholder="Anything we should know?" rows="3"></textarea>
+
+    <!-- Pay button (will be removed/hidden if item has no paymentLink) -->
+    <button id="payBtn" class="pay-btn" aria-hidden="true">Pay</button>
+
+    <!-- Visible only when there is no payment link -->
+    <div id="noLinkMsg" class="note hidden">
+      ⚠️ This account does not have a configured payment link. Please contact seller or admin.
+    </div>
+
+    <!-- Confirm button (locked until payment verified) -->
+    <button id="confirmBtn" class="confirm-btn" disabled>Confirm Order</button>
+
+    <div id="statusMsg" class="note"></div>
+
+    <button class="secondary" onclick="goBack()">← Back to Marketplace</button>
+    <p class="note" style="margin-top:14px">By confirming you agree to follow the transfer instructions sent after purchase.</p>
+  </div>
+
+<script>
+// -----------------------------
+// Configuration / data loading
+// -----------------------------
+// The page expects STORE_DATA in localStorage (same object used across your site).
+// Each store item should include a paymentLink. Example item:
+// {
+//   id: 'tiktok-comedy-180k',
+//   title: 'TikTok — Comedy (180k)',
+//   price: 1350,
+//   seller: 'LaughsCo',
+//   followers: 180000,
+//   excerpt: 'Viral sketches & strong organic reach.',
+//   paymentLink: 'https://flutterwave.com/pay/tiktok-comedy-180k'
+// }
+
+const params = new URLSearchParams(window.location.search);
+const itemId = params.get('id');
+const store = JSON.parse(localStorage.getItem('STORE_DATA') || '[]');
+const item = store.find(i => i && i.id === itemId);
+
+const detailsEl = document.getElementById('details');
+const payBtn = document.getElementById('payBtn');
+const noLinkMsg = document.getElementById('noLinkMsg');
+const confirmBtn = document.getElementById('confirmBtn');
+const statusMsg = document.getElementById('statusMsg');
+
+let paymentVerified = false;
+let paymentWindow = null;
+let paymentCheckInterval = null;
+
+// show item details or error
+if(!item) {
+  detailsEl.innerHTML = '<span class="bad">Account not found</span>';
+  payBtn.setAttribute('aria-hidden','true');
+  noLinkMsg.classList.remove('hidden');
+  noLinkMsg.textContent = 'Selected account not found in store.';
+} else {
+  // display details
+  const priceUGX = (Number(item.price || 0) * 3800).toLocaleString(); // example FX
+  detailsEl.innerHTML = `
+    <strong>${item.title}</strong><br>
+    <span class="note">${item.excerpt || ''}</span><br>
+    <span style="display:block;margin-top:8px"><strong>Price:</strong> $${item.price} — ≈ UGX ${priceUGX}</span>
+    <span style="display:block"><strong>Seller:</strong> ${item.seller || '—'}</span>
+  `;
+
+  // show/hide pay button depending on paymentLink existence
+  if(item.paymentLink && item.paymentLink.trim().length > 0) {
+    payBtn.removeAttribute('aria-hidden');
+    payBtn.textContent = 'Pay Now';
+    payBtn.onclick = () => startPayment(item);
+    noLinkMsg.classList.add('hidden');
+  } else {
+    payBtn.setAttribute('aria-hidden','true');
+    noLinkMsg.classList.remove('hidden');
+    noLinkMsg.textContent = '⚠️ This account has no payment link configured. Contact support.';
+  }
+}
+
+// -----------------------------
+// Payment flow
+// -----------------------------
+function startPayment(item) {
+  // validation: buyer info required before enabling payment
+  const name = document.getElementById('buyerName').value.trim();
+  const contact = document.getElementById('buyerContact').value.trim();
+  if(!name || !contact) {
+    alert('Please enter your full name and contact (email or WhatsApp) before proceeding to payment.');
+    return;
+  }
+
+  if(!item.paymentLink) {
+    alert('No payment link configured for this item.');
+    return;
+  }
+
+  // open payment in a new window/tab
+  const url = item.paymentLink;
+  paymentWindow = window.open(url, '_blank');
+
+  if(!paymentWindow) {
+    alert('Popup blocked. Please allow popups for this site and try again.');
+    return;
+  }
+
+  statusMsg.innerHTML = 'Payment window opened. Waiting for you to complete payment...';
+
+  // poll for window closed — when closed, attempt verification
+  paymentCheckInterval = setInterval(() => {
+    if(paymentWindow.closed) {
+      clearInterval(paymentCheckInterval);
+      statusMsg.innerHTML = 'Payment window closed — verifying payment...';
+      verifyPaymentBackend(item).catch(err=>{
+        statusMsg.innerHTML = `<span class="bad">Verification failed: ${err.message || err}</span>`;
+      });
+    }
+  }, 1200);
+}
+
+// -----------------------------
+// Payment verification
+// -----------------------------
+// IMPORTANT: for production you MUST verify payment via your backend (server).
+// This function simulates server verification then sets paymentVerified = true.
+// Replace the simulated code with a fetch() call to your server verification endpoint.
+async function verifyPaymentBackend(item) {
+  // Simulated wait for server check
+  await sleep(900);
+
+  // In production, do:
+  // const res = await fetch(`/api/verify-payment?itemId=${encodeURIComponent(item.id)}&txRef=...`);
+  // const data = await res.json();
+  // if (data && data.status === 'successful') { ... }
+
+  // For now: ask the user if the payment showed successful (simulation)
+  const ok = confirm('Did the payment show "Successful" on the payment page? Click OK if yes.');
+  if(ok) {
+    paymentVerified = true;
+    enableConfirm();
+    statusMsg.innerHTML = '<span class="success">Payment verified (simulated). You may confirm your order.</span>';
+  } else {
+    paymentVerified = false;
+    statusMsg.innerHTML = '<span class="bad">Payment not verified. Please try again or contact support.</span>';
+  }
+}
+
+// -----------------------------
+// Enable confirm
+// -----------------------------
+function enableConfirm() {
+  confirmBtn.disabled = false;
+  confirmBtn.classList.add('active');
+  confirmBtn.onclick = confirmOrder;
+}
+
+// -----------------------------
+// Confirm order action
+// -----------------------------
+function confirmOrder() {
+  if(!paymentVerified) {
+    alert('Payment not verified. You must complete payment first.');
+    return;
+  }
+  const name = document.getElementById('buyerName').value.trim();
+  const contact = document.getElementById('buyerContact').value.trim();
+  const note = document.getElementById('buyerNote').value.trim();
+
+  if(!name || !contact) {
+    alert('Please fill name and contact before confirming.');
+    return;
+  }
+
+  // prepare message to send (WhatsApp)
+  const msg = `🛒 New Order
+Account: ${item.title}
+Price: $${item.price}
+Seller: ${item.seller || '—'}
+Name: ${name}
+Contact: ${contact}
+Note: ${note || '—'}
+Payment: Verified`;
+
+  // send to your WhatsApp number (open chat)
+  const adminNumber = '256745601101'; // change if needed
+  const waUrl = `https://wa.me/${adminNumber}?text=${encodeURIComponent(msg)}`;
+  window.location.href = waUrl;
+}
+
+// -----------------------------
+// Helpers
+// -----------------------------
+function sleep(ms){ return new Promise(res=>setTimeout(res,ms)); }
+function goBack(){ window.location.href = 'index.html'; }
+
+</script>
+</body>
+</html>

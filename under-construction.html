@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Account Not Available — Under Construction</title>
+<style>
+  :root{
+    --bg1:#e6eefc;
+    --bg2:#dbe7ff;
+    --accent:#0f4ea6;
+    --muted:#6b7280;
+    --skin:#ffd9b6;
+    --hair:#3b2f2f;
+    --shirt:#1f6feb;
+    --chair:#5b6bbf;
+  }
+
+  html,body{height:100%;margin:0}
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background: radial-gradient(1200px 600px at 10% 10%, #f5f8ff 0%, transparent 20%),
+                linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#102a43;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+  }
+
+  .card{
+    width: min(760px,94%);
+    background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+    border-radius:18px;
+    box-shadow: 0 18px 50px rgba(12,31,63,0.12);
+    padding:28px;
+    display:grid;
+    grid-template-columns: 360px 1fr;
+    gap:22px;
+    align-items:center;
+  }
+
+  .left{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .right{
+    padding: 8px 12px;
+  }
+
+  h1{
+    margin:0 0 8px;
+    font-size:20px;
+    color:var(--accent);
+  }
+  p.lead{
+    margin:0 0 16px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .back{
+    display:inline-block;
+    margin-top:8px;
+    background:var(--accent);
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+  }
+
+  /* Comments/visitors area (kept minimal here) */
+  .meta{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-top:6px;
+    font-size:13px;
+    color:var(--muted);
+  }
+
+  /* SVG container sizing */
+  .scene{
+    width:320px;
+    height:320px;
+    display:block;
+  }
+
+  /* --- Animations --- */
+  /* overall subtle bob */
+  .bob { animation: bob 3.6s ease-in-out infinite; transform-origin: center bottom; }
+  @keyframes bob { 0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)} }
+
+  /* monitor glow synced with typing */
+  .monitor-screen { filter: drop-shadow(0 0 8px rgba(14,165,233,0.25)); animation: screenGlow 0.6s infinite alternate; }
+  @keyframes screenGlow { from{opacity:0.45} to{opacity:0.9} }
+
+  /* typing arms */
+  .arm-l { transform-origin: 38px 200px; animation: typeLeft 0.65s ease-in-out infinite; }
+  .arm-r { transform-origin: 92px 200px; animation: typeRight 0.65s ease-in-out infinite 0.25s; }
+  @keyframes typeLeft { 0%{rotate:8deg}100%{rotate:-18deg} }
+  @keyframes typeRight { 0%{rotate:-10deg}100%{rotate:15deg} }
+
+  /* waving hand (left) toggles between typing and waving — implemented by adding .wave class via JS */
+  .waveAnim { animation: wave 2s ease-in-out infinite; transform-origin: 34px 170px; }
+  @keyframes wave {
+    0%{rotate:0} 10%{rotate:-20deg} 30%{rotate:18deg} 50%{rotate:-10deg} 70%{rotate:12deg} 100%{rotate:0}
+  }
+
+  /* eye blink (scaleY) */
+  .eye { transform-origin:center center; animation: blink 4s infinite; }
+  @keyframes blink { 0%,94%,100%{transform:scaleY(1)} 96%{transform:scaleY(0.15)} }
+
+  /* smile movement */
+  .mouth { animation: smile 3s ease-in-out infinite; transform-origin:center; }
+  @keyframes smile { 0%{transform:translateY(0)}50%{transform:translateY(2px)}100%{transform:translateY(0)} }
+
+  /* hair bounce */
+  .hair { animation: hairMove 4.5s ease-in-out infinite; transform-origin:center top; }
+  @keyframes hairMove { 0%{transform:translateY(0)}50%{transform:translateY(-1px)}100%{transform:translateY(0)} }
+
+  /* shadow under chair */
+  .shadow { filter: blur(6px); opacity:0.12; transform-origin:center; }
+
+  /* responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; gap:18px; padding:18px; }
+    .left{ order: -1; }
+  }
+
+  /* minor polish for svg elements (cursor) */
+  .svg-click{ cursor:default; -webkit-tap-highlight-color: transparent; }
+</style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="title">
+    <div class="left" aria-hidden="false">
+      <!-- SVG character scene (detailed vector with gradients + shadows) -->
+      <svg class="scene svg-click bob" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cartoon character sitting typing">
+        <defs>
+          <linearGradient id="shirtGrad" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#2b73ff"/>
+            <stop offset="1" stop-color="#164db2"/>
+          </linearGradient>
+          <linearGradient id="skinGrad" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffe0c7"/>
+            <stop offset="1" stop-color="#ffd0ae"/>
+          </linearGradient>
+          <radialGradient id="monitorLight" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#6ee7ff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.35"/>
+          </radialGradient>
+          <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0b2340" flood-opacity="0.12"/>
+          </filter>
+        </defs>
+
+        <!-- ground shadow -->
+        <ellipse class="shadow" cx="160" cy="275" rx="78" ry="18" fill="#091827" opacity="0.12"/>
+
+        <!-- desk -->
+        <rect x="60" y="190" rx="8" ry="8" width="200" height="14" fill="#c7d6fb" />
+
+        <!-- monitor (with screen) -->
+        <g transform="translate(130,140)">
+          <rect x="-30" y="-26" width="60" height="40" rx="6" ry="6" fill="#0f1724" />
+          <rect class="monitor-screen" x="-26" y="-20" width="52" height="32" rx="3" ry="3" fill="url(#monitorLight)" opacity="0.6" />
+          <!-- monitor base -->
+          <rect x="-8" y="18" width="16" height="6" rx="2" fill="#1e293b"/>
+          <rect x="-18" y="24" width="36" height="4" rx="2" fill="#273449"/>
+        </g>
+
+        <!-- laptop/keyboard in front -->
+        <g transform="translate(80,200)">
+          <rect x="0" y="-14" width="160" height="8" rx="2" fill="#cfd9fb"/>
+          <rect x="10" y="-28" width="140" height="12" rx="4" fill="#1f2937"/>
+          <!-- keys -->
+          <g fill="#dbe5ff" opacity="0.55">
+            <!-- simple key rectangles -->
+            <rect x="18" y="-24" width="16" height="4" rx="1"/>
+            <rect x="38" y="-24" width="16" height="4" rx="1"/>
+            <rect x="58" y="-24" width="16" height="4" rx="1"/>
+            <rect x="78" y="-24" width="16" height="4" rx="1"/>
+            <rect x="98" y="-24" width="16" height="4" rx="1"/>
+            <rect x="118" y="-24" width="16" height="4" rx="1"/>
+          </g>
+        </g>
+
+        <!-- chair back -->
+        <rect x="110" y="202" width="100" height="28" rx="6" fill="#5b6bbf" />
+
+        <!-- legs (pants) -->
+        <g id="legs" transform="translate(110,214)">
+          <rect x="10" y="36" rx="6" ry="6" width="18" height="52" fill="#164db2" />
+          <rect x="50" y="36" rx="6" ry="6" width="18" height="52" fill="#164db2" />
+        </g>
+
+        <!-- body -->
+        <g id="torso" transform="translate(110,120)">
+          <rect x="10" y="36" rx="12" ry="12" width="76" height="64" fill="url(#shirtGrad)" class="shirt" />
+        </g>
+
+        <!-- arms (grouped so rotation is easier) -->
+        <g id="arms" transform="translate(120,140)">
+          <!-- left arm (waves sometimes) -->
+          <g class="arm-l" id="leftArm" transform="rotate(5)">
+            <rect x="-8" y="34" rx="6" ry="6" width="46" height="12" fill="#ffd9b6" />
+            <!-- hand -->
+            <ellipse cx="40" cy="40" rx="8" ry="7" fill="#ffd9b6" />
+          </g>
+
+          <!-- right arm (typing) -->
+          <g class="arm-r" transform="translate(40,0) rotate(-10)" id="rightArm">
+            <rect x="0" y="34" rx="6" ry="6" width="46" height="12" fill="#ffd9b6" />
+            <ellipse cx="0" cy="40" rx="8" ry="7" fill="#ffd9b6" />
+          </g>
+        </g>
+
+        <!-- neck -->
+        <rect x="146" y="132" width="12" height="14" rx="3" fill="#ffd9b6"/>
+
+        <!-- head group -->
+        <g id="head" transform="translate(135,88)">
+          <!-- hair back shape -->
+          <path class="hair" d="M12 6c0-6 10-14 28-12 18 2 24 14 24 22 0 0-6 8-20 8-12 0-22-8-32-18z" fill="#3b2f2f" />
+
+          <!-- face circle -->
+          <circle cx="30" cy="26" r="20" fill="url(#skinGrad)" />
+
+          <!-- ears -->
+          <ellipse cx="12" cy="30" rx="4" ry="6" fill="#ffd9b6" />
+          <ellipse cx="48" cy="30" rx="4" ry="6" fill="#ffd9b6" />
+
+          <!-- hair fringe -->
+          <path d="M18 22c6-8 24-10 34-4" fill="none" stroke="#201616" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+
+          <!-- eyes -->
+          <g transform="translate(0,0)" fill="#111">
+            <rect class="eye" x="20" y="22" width="6" height="6" rx="3"/>
+            <rect class="eye" x="36" y="22" width="6" height="6" rx="3"/>
+          </g>
+
+          <!-- nose -->
+          <path d="M32 30 q-3 4 -6 0" fill="transparent" stroke="#c77" stroke-width="1.2" stroke-linecap="round" />
+
+          <!-- mouth -->
+          <ellipse class="mouth" cx="32" cy="36" rx="7" ry="3" fill="#dd6b4a"/>
+        </g>
+
+        <!-- little detail: laptop cable or mug -->
+        <g transform="translate(60,210)">
+          <rect x="-6" y="4" width="12" height="12" rx="3" fill="#ffe8d6"/>
+        </g>
+
+      </svg>
+    </div>
+
+    <div class="right">
+      <h1 id="title">⚠️ Account Not Available — Under Construction</h1>
+      <p class="lead">This page or account is currently being built. Our developer is hard at work — come back soon! In the meantime, enjoy this little character typing away.</p>
+
+      <div class="meta" aria-hidden="true">
+        <div>💬 Live updates</div>
+        <div>•</div>
+        <div>🔧 Under construction</div>
+      </div>
+
+      <a class="back" href="/">← Go Back Home</a>
+    </div>
+  </div>
+
+<script>
+  // Add occasional waving: toggle left arm between typing and wave animation every ~6-8s
+  (function(){
+    const leftArm = document.getElementById('leftArm');
+    let waving = false;
+
+    function doWave(){
+      waving = true;
+      // replace typing animation with wave
+      leftArm.classList.add('waveAnim');
+      // pause typing animation by removing arm-l class
+      leftArm.classList.remove('arm-l');
+      // after 2.1s stop waving and resume typing
+      setTimeout(() => {
+        leftArm.classList.remove('waveAnim');
+        leftArm.classList.add('arm-l');
+        waving = false;
+      }, 2100);
+    }
+
+    // Start periodic wave
+    setInterval(() => {
+      if (!waving) doWave();
+    }, 7000 + Math.floor(Math.random()*3000)); // every 7-10s random
+
+    // Accessibility: if user reduces motion, reduce animations
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (media.matches) {
+      // remove animation classes
+      const el = document.querySelector('.bob');
+      if(el) el.style.animation = 'none';
+      document.querySelectorAll('.arm-l, .arm-r, .monitor-screen, .hair, .eye, .mouth').forEach(n=>{
+        n.style.animation = 'none';
+      });
+      leftArm.classList.remove('arm-l');
+    }
+  })();
+</script>
+</body>
+</html>

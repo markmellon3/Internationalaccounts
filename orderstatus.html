@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payment Receipt — SocialAccounts</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  background:#f6f7fb;
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+.card {
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+  max-width:420px;
+  text-align:center;
+}
+h2 { color:#0070ba; margin-bottom:10px; }
+p { color:#555; font-size:15px; margin:6px 0; }
+.receipt {
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:15px;
+  margin-top:15px;
+  text-align:left;
+  background:#fafafa;
+}
+hr { border:none; border-top:1px dashed #ccc; margin:10px 0; }
+button {
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+.download-btn { background:#0070ba; color:#fff; }
+.whatsapp-btn { background:#25d366; color:#fff; }
+.email-btn { background:#ff8c00; color:#fff; }
+.home-btn { background:#eee; color:#333; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Payment Receipt</h2>
+  <div id="receiptBox">Loading details...</div>
+  <button class="download-btn" id="downloadBtn">Download Receipt (PDF)</button>
+  <button class="email-btn" id="emailBtn">Send to Email</button>
+  <button class="whatsapp-btn" id="whatsappSend">Send to WhatsApp</button>
+  <button class="home-btn" onclick="window.location.href='index.html'">Back to Marketplace</button>
+</div>
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+// === Load Payment Data ===
+const params = new URLSearchParams(window.location.search);
+const name = params.get("name");
+const phone = params.get("phone");
+const email = params.get("email");
+const account = params.get("account");
+const price = params.get("price");
+const method = "Card";
+const date = new Date().toLocaleString();
+
+if (name && phone && email) {
+  document.getElementById("receiptBox").innerHTML = `
+    <div class="receipt" id="receiptContent">
+      <p><strong>Receipt ID:</strong> #${Math.floor(Math.random()*100000000)}</p>
+      <p><strong>Date:</strong> ${date}</p>
+      <hr>
+      <p><strong>Buyer Name:</strong> ${name}</p>
+      <p><strong>Phone Number:</strong> ${phone}</p>
+      <p><strong>Email Address:</strong> ${email}</p>
+      <hr>
+      <p><strong>Account Purchased:</strong><br>${account}</p>
+      <p><strong>Payment Method:</strong> ${method}</p>
+      <p><strong>Amount Paid:</strong> $${price} (≈ UGX ${(price * 3800).toLocaleString()})</p>
+      <hr>
+      <p style="text-align:center;font-weight:bold;color:#0070ba;">✅ Payment Successful</p>
+    </div>
+  `;
+}
+
+// === Download Receipt as PDF ===
+document.getElementById("downloadBtn").onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const content = document.getElementById("receiptContent").innerText;
+  doc.text(content, 10, 10);
+  doc.save(`Payment_Receipt_${name}.pdf`);
+};
+
+// === Send Receipt via WhatsApp ===
+document.getElementById("whatsappSend").onclick = () => {
+  const message = `🧾 *Payment Receipt*%0A%0A👤 Name: ${name}%0A📞 Phone: ${phone}%0A✉️ Email: ${email}%0A💳 Account: ${account}%0A💰 Amount: $${price}%0A💱 (≈ UGX ${(price * 3800).toLocaleString()})%0A💳 Method: ${method}%0A📅 Date: ${date}%0A✅ Payment Successful`;
+  const whatsappLink = `https://wa.me/256745601101?text=${message}`;
+  window.open(whatsappLink, "_blank");
+};
+
+// === Send Receipt via Email ===
+emailjs.init("YOUR_PUBLIC_KEY_HERE"); // Replace with your EmailJS Public Key
+
+document.getElementById("emailBtn").onclick = () => {
+  const templateParams = {
+    to_name: name,
+    to_email: email,
+    buyer_name: name,
+    buyer_phone: phone,
+    account_name: account,
+    payment_amount: `$${price} (≈ UGX ${(price * 3800).toLocaleString()})`,
+    payment_method: method,
+    date: date
+  };
+
+  emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
+    .then(() => {
+      alert(`✅ Receipt successfully sent to ${email}`);
+    })
+    .catch((err) => {
+      console.error("EmailJS Error:", err);
+      alert("⚠️ Failed to send email. Please check your EmailJS setup.");
+    });
+};
+</script>
+</body>
+</html>

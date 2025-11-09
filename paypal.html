@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PayPal Accounts — SocialAccounts</title>
+<style>
+:root {
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0070ba;
+  --radius:16px;
+}
+body {
+  margin:0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color:#111;
+}
+header {
+  background: var(--accent);
+  color:#fff;
+  text-align:center;
+  padding:20px;
+  font-size:22px;
+  font-weight:700;
+}
+.container {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap:20px;
+  padding:30px;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+  padding:20px;
+  transition:transform 0.3s ease;
+}
+.card:hover { transform:translateY(-5px); }
+.card h3 { margin-top:0; color:var(--accent); }
+.card p { color:var(--muted); font-size:15px; }
+button {
+  display:block;
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.3s;
+}
+.view-btn { background:var(--accent); color:#fff; }
+.view-btn:hover { background:#005c99; }
+.buy-btn { background:green; color:#fff; }
+.buy-btn:hover { background:darkgreen; }
+footer {
+  text-align:center;
+  padding:20px;
+  font-size:14px;
+  color:var(--muted);
+  border-top:1px solid #ddd;
+  margin-top:40px;
+}
+
+/* Password Popup */
+#passwordGate {
+  position:fixed;
+  inset:0;
+  backdrop-filter: blur(10px);
+  background:rgba(0,0,0,0.6);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+}
+.password-box {
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.2);
+  padding:40px;
+  border-radius:20px;
+  text-align:center;
+  backdrop-filter: blur(15px);
+  animation: fadeIn 0.7s ease;
+}
+.password-box h2 { font-size:24px; margin-bottom:10px; }
+.password-box input {
+  padding:12px;
+  width:240px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  margin-top:12px;
+  text-align:center;
+}
+.password-box button {
+  width:150px;
+  margin-top:16px;
+  background:var(--accent);
+  color:#fff;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  padding:10px;
+}
+.password-box button:hover { background:#005c99; }
+#passwordError { color:#ff6666; margin-top:10px; font-size:14px; }
+@keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+</style>
+</head>
+<body>
+
+<div id="passwordGate">
+  <div class="password-box">
+    <h2>🔐 Access Restricted</h2>
+    <p>Enter password to view PayPal accounts</p>
+    <input type="password" id="accessPassword" placeholder="Enter password" />
+    <button onclick="checkPassword()">Unlock</button>
+    <div id="passwordError"></div>
+  </div>
+</div>
+
+<header>💳 PayPal Verified Accounts</header>
+<div class="container" id="paypalContainer"></div>
+
+<footer>
+  &copy; 2025 SocialAccounts Marketplace — Verified PayPal Accounts
+</footer>
+
+<script>
+const ACCESS_PASSWORD = "12345"; // 🔐 Change your password here
+
+const PAYPAL_ACCOUNTS = [
+  { id:'paypal-premium-1', title:'PayPal — Premium Business (Verified)', platform:'PayPal', country:'US', price:95, seller:'PayVault', excerpt:'Verified US business PayPal account with full access.' },
+  { id:'paypal-personal-2', title:'PayPal — Personal (Verified)', platform:'PayPal', country:'UK', price:95, seller:'SafeTrade', excerpt:'Fully verified UK personal PayPal account.' },
+  { id:'paypal-business-3', title:'PayPal — Business (High Trust)', platform:'PayPal', country:'Canada', price:95, seller:'DigitalHub', excerpt:'Active PayPal business account with clean record.' },
+  { id:'paypal-usd-4', title:'PayPal — USD Wallet (Active)', platform:'PayPal', country:'US', price:95, seller:'TradeCenter', excerpt:'Verified PayPal USD wallet with secure credentials.' }
+];
+
+localStorage.setItem("PAYPAL_DATA", JSON.stringify(PAYPAL_ACCOUNTS));
+
+const container = document.getElementById('paypalContainer');
+PAYPAL_ACCOUNTS.forEach(item => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <h3>${item.title}</h3>
+    <p>${item.excerpt}</p>
+    <p><strong>Country:</strong> ${item.country}</p>
+    <p><strong>Seller:</strong> ${item.seller}</p>
+    <p><strong>Price:</strong> $${item.price}</p>
+    <button class="view-btn" onclick="viewItem('${item.id}')">View Details</button>
+    <button class="buy-btn" onclick="buyNow('${item.id}')">Buy Now</button>
+  `;
+  container.appendChild(card);
+});
+
+function checkPassword() {
+  const input = document.getElementById("accessPassword").value.trim();
+  const error = document.getElementById("passwordError");
+  if (input === ACCESS_PASSWORD) {
+    document.getElementById("passwordGate").style.display = "none";
+  } else {
+    error.textContent = "❌ Incorrect password. Try again.";
+  }
+}
+
+function viewItem(id) {
+  alert(`Viewing details for ${id}`);
+}
+
+function buyNow(id) {
+  window.location.href = `payment2.html?id=${id}`;
+}
+</script>
+</body>
+</html>

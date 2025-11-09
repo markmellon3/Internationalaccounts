@@ -1,0 +1,1784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SocialAccounts — Premium Marketplace</title>
+
+<style>
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0a84ff;
+  --glass:rgba(10,132,255,0.06);
+  --shadow-1:0 6px 18px rgba(21,26,33,0.06);
+  --radius:14px;
+  --text:#0b1220;
+}
+.dark {
+  --bg:#020205;
+  --card:#0b0b0d;
+  --muted:#9aa4b2;
+  --accent:#58a6ff;
+  --glass:rgba(88,166,255,0.06);
+  --shadow-1:0 10px 30px rgba(2,6,23,0.65);
+  --text:#e6eef8;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;padding:0;overflow-x:hidden;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Layout */
+.wrap{max-width:1100px;margin:20px auto;padding:0 16px;}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo{
+  width:46px;height:46px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#6fb2ff);
+  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;
+  box-shadow:var(--shadow-1);
+}
+.brand h1{font-size:18px;margin:0;}
+.brand p{margin:0;color:var(--muted);font-size:13px;}
+nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;}
+.btn-cta{background:var(--accent);color:white;padding:9px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(10,132,255,0.12);}
+.theme-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px;border-radius:10px;cursor:pointer;color:var(--muted);}
+
+/* Hero section */
+.hero{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;margin-top:18px;}
+.eyebrow{font-size:13px;color:var(--muted);letter-spacing:.6px;margin-bottom:8px;}
+.hero-title{font-size:32px;font-weight:800;margin:6px 0 8px;line-height:1.2;}
+.hero-sub{color:var(--muted);max-width:56ch;margin-bottom:18px;}
+
+/* Search bar */
+.search-card{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow-1);display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.search-input{flex:1;border:0;padding:10px 12px;font-size:15px;border-radius:10px;background:transparent;outline:none;min-width:160px;}
+.search-select{border:0;background:transparent;padding:10px;border-left:1px solid var(--glass);padding-left:10px;min-width:110px;}
+.search-action{padding:10px 14px;border-radius:10px;background:var(--accent);color:white;border:0;font-weight:700;cursor:pointer;min-width:100px;}
+
+/* Panels and filters */
+.panel{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow-1);}
+.filters button{display:block;width:100%;text-align:left;padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;margin-bottom:8px;font-weight:700;color:var(--text);cursor:pointer;}
+.trust-list{color:var(--muted);font-size:14px;line-height:1.6;margin-top:8px;}
+
+/* Results grid */
+.results{margin-top:26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
+.card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow-1);border:1px solid rgba(11,18,32,0.02);transition:transform .18s ease,box-shadow .18s ease;cursor:pointer;}
+.card:hover{transform:translateY(-6px);box-shadow:0 14px 32px rgba(11,18,32,0.12);}
+.card-head{display:flex;align-items:center;gap:12px;}
+.platform-pill{padding:6px 9px;border-radius:10px;background:linear-gradient(90deg,#f1f8ff,#ecf6ff);color:var(--accent);font-weight:800;font-size:13px;}
+.card h3{margin:8px 0 6px;font-size:16px;}
+.meta{color:var(--muted);font-size:13px;}
+.card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px;}
+.price{font-weight:900;font-size:18px;color:var(--text);}
+.small-btn{padding:8px 12px;border-radius:10px;border:1px solid var(--glass);background:transparent;font-weight:800;cursor:pointer;}
+
+/* Drawer (account view) */
+.drawer{
+  position:fixed;right:22px;top:84px;width:420px;background:var(--card);
+  border-radius:14px;box-shadow:0 28px 80px rgba(11,18,32,0.22);
+  padding:18px;transform:translateX(18px);opacity:0;transition:transform .28s ease,opacity .28s ease;
+  z-index:140;max-height:82vh;overflow:auto;
+}
+.drawer.open{transform:translateX(0);opacity:1;}
+.gallery{height:160px;border-radius:10px;background:linear-gradient(135deg,#f8fbff,#eef6ff);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;margin-bottom:12px;}
+button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);outline-offset:3px;}
+
+/* ✅ Responsive Adjustments */
+@media (max-width:1024px){
+  .hero{grid-template-columns:1fr;gap:20px;}
+  aside{order:-1;margin-bottom:20px;}
+}
+
+@media (max-width:768px){
+  .wrap{padding:0 12px;}
+  header{flex-direction:column;align-items:flex-start;gap:6px;}
+  nav{width:100%;display:flex;flex-wrap:wrap;gap:8px;}
+  .hero-title{font-size:26px;}
+  .search-card{flex-direction:column;align-items:stretch;}
+  .search-select{border-left:none;border-top:1px solid var(--glass);}
+}
+
+@media (max-width:480px){
+  body{font-size:15px;}
+  .logo{width:40px;height:40px;font-size:14px;}
+  .hero-title{font-size:22px;}
+  .drawer{
+    left:0;right:0;top:auto;bottom:0;width:100%;
+    border-radius:14px 14px 0 0;max-height:85vh;
+    transform:translateY(20px);
+  }
+  .drawer.open{transform:translateY(0);}
+  .card-foot{flex-direction:column;align-items:flex-start;}
+  .search-card{padding:8px;}
+  .search-input,.search-select,.search-action{width:100%;font-size:14px;}
+  .btn-cta{width:100%;text-align:center;}
+}
+
+@media (max-width:360px){
+  .hero-title{font-size:20px;}
+  .price{font-size:16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">SA</div>
+      <div>
+        <h1>INTERNATIONAL ACCOUNT'S </h1>
+        <p>Global marketplace</p>
+      </div>
+    </div>
+    <nav>
+      <a href="#" onclick="goHome(event)">HOME</a>
+      <a href="paypal.html" class="nav-btn">PAYPAL ACCOUNTS </a>
+      <a class="theme-toggle" id="themeToggle">🌙</a>
+      <button class="btn-cta" onclick="openSell()">List an account</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Trusted · Escrow · Verified</div>
+      <h2 class="hero-title">Buy premium International social media accounts at cheap costs</h2>
+      <p class="hero-sub">Search verified Instagram, TikTok, YouTube, Spotify and Twitter accounts by followers, language, niche and region.</p>
+
+      <div class="search-card">
+        <input id="searchInput" class="search-input" placeholder="Search…" />
+        <select id="searchPlatform" class="search-select">
+          <option value="">Any</option>
+          <option>Instagram</option>
+          <option>TikTok</option>
+          <option>YouTube</option>
+          <option>Twitter</option>
+          <option>Spotify</option>
+          <option>LinkedIn</option>
+          <option>Twitch</option>
+        </select>
+        <button type="button" class="search-action" onclick="runSearch()">Search</button>
+      </div>
+
+      <div id="results" class="results"></div>
+    </div>
+
+    <aside style="display:grid;gap:16px">
+      <div class="panel">
+        <strong>Quick filters</strong>
+        <div class="filters" style="margin-top:10px">
+          <button onclick="applyFilter('Instagram')">Instagram</button>
+          <button onclick="applyFilter('TikTok')">TikTok</button>
+          <button onclick="applyFilter('YouTube')">YouTube</button>
+          <button onclick="applyFilter('Spotify')">Spotify</button>
+          <button onclick="applyFilter('LinkedIn')">LinkedIn</button>
+          <button onclick="applyFilter('Twitch')">Twitch</button>
+        </div>
+      </div>
+      <div class="panel">
+        <strong>Why choose international Accounts</strong>
+        <ul class="trust-list">
+          <li>Escrow-protected payments</li>
+          <li>automatic verification</li>
+          <li>24/7 dispute mediation</li>
+          <li>NOTE:⚠️Please switch to desktop mode for better view</li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<!-- Drawer -->
+<div id="drawer" class="drawer">
+  <div class="gallery" id="drawerGallery">Preview</div>
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div id="drawerTitle" style="font-weight:800;font-size:18px"></div>
+        <div class="muted" id="drawerMeta" style="margin-top:6px"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="muted" style="font-size:13px">Seller</div>
+        <div id="drawerSeller" style="font-weight:800">--</div>
+      </div>
+    </div>
+    <p id="drawerDesc" class="muted" style="margin-top:12px"></p>
+    <div style="margin-top:12px;display:flex;gap:12px;align-items:center">
+      <div style="font-size:20px;font-weight:900" id="drawerPrice">$0</div>
+      <div class="muted">USD</div>
+    </div>
+
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-cta" id="stripeBtn" onclick="startStripe()">Pay with Card</button>
+      <button class="small-btn" id="testAccountBtn" onclick="openTestAccount()">Test Account</button>
+    </div>
+
+    <div style="margin-top:14px;color:var(--muted);font-size:13px">
+      After payment you'll follow guided transfer steps.
+    </div>
+
+    <div style="margin-top:14px;text-align:right">
+      <button class="small-btn" onclick="closeDrawer()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- === EMAIL & SOCIAL MEDIA SERVICE WIDGET === -->
+<div id="serviceWidgetContainer">
+  <!-- EMAIL CARD -->
+  <div class="card">
+    <h3>Email Accounts</h3>
+    <p>Verified, ready-to-use premium email accounts with high trust.</p>
+    <button id="viewEmailsBtn">View Email List</button>
+  </div>
+
+  <!-- SOCIAL MEDIA CARD -->
+  <div class="card">
+    <h3>Social Media Services</h3>
+    <p>Buy TikTok & Instagram followers and likes instantly.</p>
+    <button id="viewSocialBtn">View Services</button>
+  </div>
+
+  <!-- EMAIL PANEL -->
+  <div id="emailPanel" class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3>Email Accounts</h3>
+      <button id="closeEmailPanelBtn" class="closeBtn">×</button>
+    </div>
+    <div id="emailList"></div>
+  </div>
+
+  <!-- SOCIAL MEDIA PANEL -->
+  <div id="socialPanel" class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3>Social Media Services</h3>
+      <button id="closeSocialPanelBtn" class="closeBtn">×</button>
+    </div>
+    <div style="display:flex; margin-bottom:1rem;">
+      <button id="tiktokTab" class="tab active">TikTok</button>
+      <button id="instagramTab" class="tab">Instagram</button>
+    </div>
+    <div id="socialList"></div>
+  </div>
+</div>
+
+<style>
+/* General styling */
+#serviceWidgetContainer * { box-sizing:border-box; font-family:'Poppins', sans-serif; }
+#serviceWidgetContainer .card { background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin:1rem; }
+#serviceWidgetContainer .card h3 { margin-top:0; }
+#serviceWidgetContainer .card button { border:none; padding:10px 16px; border-radius:8px; cursor:pointer; }
+#serviceWidgetContainer #viewEmailsBtn { background:#0a84ff; color:#fff; }
+#serviceWidgetContainer #viewSocialBtn { background:#ff2d55; color:#fff; }
+
+/* Panels */
+#serviceWidgetContainer .panel {
+  position:fixed; top:0; right:-100%; width:360px; height:100%; background:#fff;
+  box-shadow:-2px 0 8px rgba(0,0,0,0.2); transition:right 0.3s ease; z-index:10000; padding:1rem; overflow-y:auto;
+}
+#serviceWidgetContainer .panel h3 { margin-top:0; }
+#serviceWidgetContainer .panel button.closeBtn { background:none; border:none; font-size:20px; cursor:pointer; }
+
+/* Tabs */
+#serviceWidgetContainer .tab { flex:1; padding:8px; border:none; cursor:pointer; }
+#serviceWidgetContainer .tab.active { background:#ff2d55; color:#fff; }
+
+/* Quick buttons and inputs */
+#serviceWidgetContainer .quickBtn { margin:2px; padding:4px 8px; border:none; background:#0a84ff; color:#fff; border-radius:4px; cursor:pointer; }
+#serviceWidgetContainer .quantitySelect, #serviceWidgetContainer .accountInput { padding:6px; margin-bottom:6px; border:1px solid #ccc; border-radius:4px; width:100%; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('serviceWidgetContainer');
+
+  const emails = [
+    { name: "travelhub@gmail.com", country: "US", price: 1, paymentPage: "email-payment.html" },
+    { name: "luxurybrand@mail.com", country: "UK", price: 1, paymentPage: "email-payment.html" },
+    { name: "techinspo@yahoo.com", country: "CA", price: 1, paymentPage: "email-payment.html" },
+    { name: "creatorzone@gmail.com", country: "AU", price: 1, paymentPage:"email-payment.html" },
+    { name: "mediahouse@mail.com", country: "DE", price: 1, paymentPage: "email-payment.html" },
+    { name: "influencer@gmail.com", country: "FR", price: 1, paymentPage: "email-payment.html" },
+    { name: "music@outlook.com", country: "NG", price: 1, paymentPage: "email-payment.html" },
+    { name: "trendhub@mail.com", country: "KE", price: 1, paymentPage: "email-payment.html" },
+    { name: "bizconnect@gmail.com", country: "IN", price: 1, paymentPage: "email-payment.html" },
+    { name: "festylezone@mail.com", country: "ZA", price: 1, paymentPage: "email-payment.html" }
+  ];
+
+  const socialServices = {
+    TikTok: [
+      { name: "Followers", pricePerThousand: 4, paymentPage: "social-payment.html" },
+      { name: "Likes", pricePerThousand: 2, paymentPage: "social-payment.html" }
+    ],
+    Instagram: [
+      { name: "Followers", pricePerThousand: 8, paymentPage: "social-payment.html" },
+      { name: "Likes", pricePerThousand: 2, paymentPage: "social-payment.html" }
+    ]
+  };
+
+  const quantityOptions = []; 
+  for (let i = 1000; i <= 1000000; i+=1000) quantityOptions.push(i);
+  const quickQuantities = [1000,5000,10000,50000,100000];
+
+  // === EMAIL PANEL ===
+  const emailListContainer = container.querySelector('#emailList');
+  emails.forEach(email => {
+    const div = document.createElement('div');
+    div.style = "display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:8px; border-bottom:1px solid #eee;";
+    div.innerHTML = `
+      <div>
+        <strong>${email.name}</strong><br>
+        <small>${email.country}</small><br>
+        <span style="color:#0a84ff; font-weight:600;">$${email.price}</span>
+      </div>
+      <button style="background:#0a84ff; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">Select</button>
+    `;
+    const btn = div.querySelector('button');
+    btn.addEventListener('click',()=> {
+      window.location.href = `${email.paymentPage}?email=${encodeURIComponent(email.name)}&price=${email.price}`;
+    });
+    emailListContainer.appendChild(div);
+  });
+
+  // === SOCIAL PANEL ===
+  const socialListContainer = container.querySelector('#socialList');
+  function loadSocialServices(platform){
+    socialListContainer.innerHTML = '';
+    socialServices[platform].forEach(service=>{
+      const div = document.createElement('div');
+      div.style = "display:flex; flex-direction:column; margin-bottom:15px; padding:8px; border-bottom:1px solid #eee; border-radius:6px;";
+
+      const quickButtonsHTML = quickQuantities.map(q => `<button class="quickBtn" data-value="${q}">${q}</button>`).join('');
+      div.innerHTML = `
+        <div style="margin-bottom:6px;">
+          <strong>${service.name}</strong> - <small>${platform}</small><br>
+          <span style="color:#ff2d55; font-weight:600;">$${service.pricePerThousand} per 1000 ${service.name.toLowerCase()}</span>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="margin-bottom:6px;">Quick quantities: ${quickButtonsHTML}</div>
+          <select class="quantitySelect"><option value="">Select quantity</option>${quantityOptions.map(q=>`<option value="${q}">${q}</option>`).join('')}</select>
+          <input type="text" placeholder="Enter your account link" class="accountInput"/>
+          <div style="margin-bottom:6px; font-weight:bold; color:#ff2d55;">Total: $<span class="totalPrice">0</span></div>
+          <button style="background:#ff2d55; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">Select</button>
+        </div>
+      `;
+      socialListContainer.appendChild(div);
+
+      const quantitySelect = div.querySelector('.quantitySelect');
+      const accountInput = div.querySelector('.accountInput');
+      const totalPriceEl = div.querySelector('.totalPrice');
+      const selectBtn = div.querySelector('button');
+      const quickBtns = div.querySelectorAll('.quickBtn');
+
+      quickBtns.forEach(btn => {
+        btn.addEventListener('click',()=> {
+          const value = parseInt(btn.dataset.value);
+          quantitySelect.value = value;
+          totalPriceEl.textContent = ((value/1000)*service.pricePerThousand).toFixed(2);
+        });
+      });
+
+      quantitySelect.addEventListener('change',()=>{
+        const qty = parseInt(quantitySelect.value)||0;
+        totalPriceEl.textContent = ((qty/1000)*service.pricePerThousand).toFixed(2);
+      });
+
+      selectBtn.addEventListener('click',()=>{
+        const qty = parseInt(quantitySelect.value);
+        const account = accountInput.value.trim();
+        if(!qty){alert("Please select a quantity."); return;}
+        if(!account){alert("Please enter your account link."); return;}
+        const total = ((qty/1000)*service.pricePerThousand).toFixed(2);
+        window.location.href = `${service.paymentPage}?service=${encodeURIComponent(service.name)}&platform=${platform}&quantity=${qty}&account=${encodeURIComponent(account)}&total=${total}`;
+      });
+    });
+  }
+
+  loadSocialServices('TikTok');
+
+  // === TAB SWITCH ===
+  container.querySelector('#tiktokTab').addEventListener('click',()=>{
+    loadSocialServices('TikTok');
+    container.querySelector('#tiktokTab').classList.add('active');
+    container.querySelector('#instagramTab').classList.remove('active');
+  });
+  container.querySelector('#instagramTab').addEventListener('click',()=>{
+    loadSocialServices('Instagram');
+    container.querySelector('#instagramTab').classList.add('active');
+    container.querySelector('#tiktokTab').classList.remove('active');
+  });
+
+  // === OPEN/CLOSE PANELS ===
+  container.querySelector('#viewEmailsBtn').addEventListener('click',()=>{container.querySelector('#emailPanel').style.right='0';});
+  container.querySelector('#viewSocialBtn').addEventListener('click',()=>{container.querySelector('#socialPanel').style.right='0';});
+  container.querySelector('#closeEmailPanelBtn').addEventListener('click',()=>{container.querySelector('#emailPanel').style.right='-100%';});
+  container.querySelector('#closeSocialPanelBtn').addEventListener('click',()=>{container.querySelector('#socialPanel').style.right='-100%';});
+});
+</script>
+
+<footer style="text-align:center;padding:34px 0;color:var(--muted)">
+  © <span id="year"></span> Account Approval Request 
+</footer>
+
+<script>
+/* =========================
+   SOCIALACCOUNTS MARKETPLACE
+   ========================= */
+// === SPOTIFY (6) ===
+const STORE = [
+  
+   // === account1 ===
+  { id:'spotify-lofi-1000k', title:'Spotify -Lofi Beats (NEWEST)', platform:'Spotify', followers:1000, lang:'Instrumental', country:'United States', price:10, seller:'ChillZone', excerpt:'Calm instrumental playlist with 1M+ monthly plays.', link:'https://open.spotify.com/user/31d3fwxpajdyei62fzj4l2c7xujq?si=l1Cuweu7QRiQAGhHxyBb7A',  paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73"},
+  
+  // === account2 === 
+  { id:'spotify-chill-1000k', title:'Spotify — Chill Vibes (NEWEST)', platform:'Spotify', followers:1000, lang:'Chill', country:'United States', price:10, seller:'ChillHub', excerpt:'Relaxing chill tracks for your day.', link:'https://open.spotify.com/user/31wgoi3exliw7rpcerqdriur5hti?si=w-SCBfICTeKHfXZhegdVtw',paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73" },
+  
+  // === account3 === 
+  { id:'spotify-workout-1000k', title:'Spotify — Workout Beats (NEWEST)', platform:'Spotify', followers:1000, lang:'Electronic', country:'United States', price:10, seller:'FitTunes', excerpt:'High-energy tracks for your workouts.', link:'https://open.spotify.com/user/31khcucewipoqwwi2uc33iw4mp5m?si=7ZU_ShguQnuZua6shcOItA',paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73" },
+  
+  // === account4 ===  
+  { id:'spotify-jazz-1000k', title:'Spotify — Smooth Jazz (NEWEST)', platform:'Spotify', followers:1000, lang:'Jazz', country:'UNITED KINGDOM', price:10, seller:'JazzMasters', excerpt:'Smooth jazz playlist for relaxing evenings.', link:'https://socialaccounts.test/demo/spotify-jazz-20k',paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73" },
+  
+  
+  // === account5 ===
+  { id:'spotify-rock-1000k', title:'Spotify — Rock Classics (NEWEST)', platform:'Spotify', followers:1000, lang:'Rock', country:'UNITED KINGDOM', price:10, seller:'RockNation', excerpt:'Classic rock tracks from all eras.', link:'https://socialaccounts.test/demo/spotify-rock-70k',paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73" },
+  
+  
+  // === account6 ===  
+  { id:'spotify-hiphop-2000k', title:'Spotify — HipHop Beats (VERIFIED)', platform:'Spotify', followers:2000, lang:'HipHop', country:'UNITED STATES', price:15, seller:'HipHopFlow', excerpt:'Popular hip hop tracks and beats.', link:'https://socialaccounts.test/demo/spotify-hiphop-80k',  paymentLink: "https://payments.munopay.com/pay?id=a7b0d5964e6cb951" },
+   
+   // === INSTAGRAM (8) ===
+   
+   // === account1 ===
+  { id:'insta-travel-1000k', title:'Instagram — Travel Creator (NEWEST)', platform:'Instagram', followers:1000, lang:'English', country:'USA', price:11, seller:'TravelHub', excerpt:'Active travel Reels & high engagement.', link:'https://socialaccounts.test/demo/insta-travel-50k',paymentLink: "https://store.pesapal.com/internationalinstagrampayment" },
+  
+  // === account2 ===
+  { id:'insta-fashion-1000', title:'Instagram — Fashion Blogger(NEWEST)', platform:'Instagram', followers:1000, lang:'English', country:'UK', price:11, seller:'StyleGuru', excerpt:'Trendy outfits, brand collabs, and 7% engagement.', link:'https://socialaccounts.test/demo/insta-fashion-120k', paymentLink: "https://store.pesapal.com/internationalinstagrampayment" },
+  
+  // === account3 ===
+  { id:'insta-foodie-1000k', title:'Instagram — Foodie Page (NEWEST)', platform:'Instagram', followers:1000, lang:'English', country:'USA', price:11, seller:'TastyVibes', excerpt:'Daily recipes, high comment activity.', link:'https://socialaccounts.test/demo/insta-foodie-80k', paymentLink: "https://store.pesapal.com/internationalinstagrampayment"},
+  
+  // === account4 ===
+  { id:'insta-pets-1000k', title:'Instagram — Cute Pets (NEWEST)', platform:'Instagram', followers:1000, lang:'English', country:'UK', price:11, seller:'FurLovers', excerpt:'Pet lovers audience, highly active.', link:'https://socialaccounts.test/demo/insta-pets-45k',paymentLink: "https://store.pesapal.com/internationalinstagrampayment" },
+  
+  // === account5 ===
+  { id:'insta-lifestyle-2000k', title:'Instagram — Lifestyle Influencer (VERIFIED)', platform:'Instagram', followers:2000, lang:'English', country:'UK', price:16, seller:'DailyGlow', excerpt:'Modern lifestyle & wellness audience.', link:'https://socialaccounts.test/demo/insta-lifestyle-200k', paymentLink: "https://store.pesapal.com/internationalinstagrampayment" },
+  
+  // === account6 ===
+  { id:'insta-art-2000k', title:'Instagram — Digital Art (VERIFIED)', platform:'Instagram', followers:2000, lang:'English', country:'USA', price:16, seller:'ArtVibe', excerpt:'Creative illustrations and concept art.', link:'https://socialaccounts.test/demo/insta-art-25k', paymentLink: "https://store.pesapal.com/internationalinstagrampayment"},
+  
+  // === account7 ===
+  { id:'insta-fitness-2000k', title:'Instagram — Fitness Coach (VERIFIED)', platform:'Instagram', followers:2000, lang:'English', country:'UK', price:16, seller:'FitForce', excerpt:'Workout reels, brand partnerships.', link:'https://socialaccounts.test/demo/insta-fitness-90k',paymentLink: "https://store.pesapal.com/internationalinstagrampayment"},
+  
+  // === account8 ===
+  { id:'insta-meme-5000k', title:'Instagram — Meme Page (VERIFIED)', platform:'Instagram', followers:5000, lang:'English', country:'US', price:16, seller:'LaughCentral', excerpt:'Viral meme content with strong reach.', link:'under-construction.html', paymentLink: "paymentURL"},
+  
+      
+  
+    // === TIKTOK (9) ===
+    
+    // === account1 ===
+  { id:'tiktok-1000k', title:'TikTok —  (NEWEST)', platform:'TikTok', followers:1000, lang:'English', country:'UNITED STATES ', price:7, seller:'MM-INDUSTRY ', excerpt:'Supports live stream & strong fyp reach.', link:'https://www.tiktok.com/@happiness.009?_r=1&_t=ZM-916PzxkSVbw' },
+  
+  // === account2 ===
+  { id:'tiktok-2000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:2000, lang:'English', country:'UNITED KINGDOM ', price:10, seller:'GrooveNation', excerpt:'Trendy Supports live stream & strong fyp reach .', link:'https://socialaccounts.test/demo/tiktok-dance-400k' },
+  
+  // === account2 ===
+  { id:'tiktok-3000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:3000, lang:'English', country:'UNITED STATES', price:12, seller:'JokeStream', excerpt:'Supports live stream & strong fyp reach.', link:'https://socialaccounts.test/demo/tiktok-pranks-90k' },
+  
+  // === account3 ===
+  { id:'tiktok-4000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:4000, lang:'English', country:'UNITED STATES ', price:13, seller:'TastyTrail', excerpt:'Supports live stream & viral mega views fyp .', link:'https://socialaccounts.test/demo/tiktok-food-150k' },
+  
+  // === account4 ===
+  { id:'tiktok-5000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:5000, lang:'English', country:'EUROPE ', price:15, seller:'GameZone', excerpt:'High live stream view count & strong fyp.', link:'https://socialaccounts.test/demo/tiktok-gaming-250k' },
+  
+  // === account5 ===
+  { id:'tiktok-fashion-10000', title:'TikTok — (VERIFIED)', platform:'TikTok', followers:6000, lang:'English', country:'EUROPE', price:16, seller:'StyleWave', excerpt:'Fashion & style high market ordinance/live stream .', link:'https://socialaccounts.test/demo/tiktok-fashion-70k' },
+  
+  // === account6 ===
+  { id:'tiktok-travel-300k', title:'TikTok — Travel Vlogs (300k)', platform:'TikTok', followers:300000, lang:'English', country:'TH', price:2100, seller:'WanderWorld', excerpt:'Adventure travel & cinematic vlogs.', link:'https://socialaccounts.test/demo/tiktok-travel-300k' },
+  
+  // === account7 ===
+  { id:'tiktok-edu-180k', title:'TikTok — Educational (180k)', platform:'TikTok', followers:180000, lang:'English', country:'US', price:1250, seller:'SmartTips', excerpt:'Quick learning & productivity hacks.', link:'https://socialaccounts.test/demo/tiktok-edu-180k' },
+  
+  // === account8 ===
+  { id:'tiktok-relationship-60k', title:'TikTok — Relationship Talks (PRE-ORDER)', platform:'TikTok', followers:60000, lang:'English', country:'NG', price:300, seller:'HeartTalks', excerpt:'Daily advice on love and motivation.', link:'https://socialaccounts.test/demo/tiktok-relationship-60k' },
+  
+  // === account9 ===
+  { id:'tiktok-tech-1M', title:'TikTok — Tech Reviews (PRE-ORDER)', platform:'TikTok', followers:1000000, lang:'English', country:'US', price:2700, seller:'TechByte', excerpt:'Gadget reviews & unboxings.', link:'https://socialaccounts.test/demo/tiktok-tech-500k' },
+  
+  // === account10 ===
+  { id:'tiktok-Account1-1000k', title:'TikTok — account1-(1000k)', platform:'TikTok', followers:500000, lang:'Spanish', country:'United States', price:2000, seller:'LaughsCo', excerpt:'Viral sketches & strong organic reach.', link:'https://www.tiktok.com/@quinerror?_r=1&_t=ZM-916PtwZwEtX' },
+  
+  // === YOUTUBE (7) ===
+  
+  // === account1 ===
+  { id:'yt-tech-15k', title:'YouTube — Tech Channel (15k)', platform:'YouTube', followers:15000, lang:'English', country:'US', price:620, seller:'TechMinded', excerpt:'Engaged tech followers and niche content.', link:'https://socialaccounts.test/demo/yt-tech-15k' },
+  
+  // === account1 ===
+  { id:'yt-vlog-40k', title:'YouTube — Lifestyle Vlogger (40k)', platform:'YouTube', followers:40000, lang:'English', country:'US', price:890, seller:'LifeMoments', excerpt:'Daily lifestyle & travel vlogs.', link:'https://socialaccounts.test/demo/yt-vlog-40k' },
+  
+  // === account2 ===
+  { id:'yt-gaming-200k', title:'YouTube — Gaming Channel (200k)', platform:'YouTube', followers:200000, lang:'English', country:'US', price:2100, seller:'ProGamer', excerpt:'Gameplays and live streams.', link:'https://socialaccounts.test/demo/yt-gaming-200k' },
+  
+  // === account3 ===
+  { id:'yt-cooking-80k', title:'YouTube — Cooking Channel (80k)', platform:'YouTube', followers:80000, lang:'English', country:'IN', price:970, seller:'HomeChef', excerpt:'Tasty and easy recipes.', link:'https://socialaccounts.test/demo/yt-cooking-80k' },
+  
+  // === account4 ===
+  { id:'yt-tech-15k', title:'YouTube — Tech Channel (15k)', platform:'YouTube', followers:15000, lang:'English', country:'US', price:620, seller:'TechMinded', excerpt:'Engaged tech followers and niche content.', link:'https://socialaccounts.test/demo/yt-tech-15k' },
+  
+  // === account5 ===
+  { id:'yt-tech-15k', title:'YouTube — Tech Channel (15k)', platform:'YouTube', followers:15000, lang:'English', country:'US', price:620, seller:'TechMinded', excerpt:'Engaged tech followers and niche content.', link:'https://socialaccounts.test/demo/yt-tech-15k' },
+  
+  // === account6 ===
+  { id:'yt-education-150k', title:'YouTube — Educational (150k)', platform:'YouTube', followers:150000, lang:'English', country:'US', price:1400, seller:'SmartAcademy', excerpt:'Study tips, tutorials & explainer videos.', link:'https://socialaccounts.test/demo/yt-education-150k' }, 
+  
+  // === TWITCH (4) ===
+{ id:'twitch-gamer-80k', title:'Twitch — Pro Gamer (80k)', platform:'Twitch', followers:80000, lang:'English', country:'US', price:720, seller:'StreamNation', excerpt:'High-energy gaming streams with loyal followers.', link:'https://socialaccounts.test/demo/twitch-gamer-80k' },
+
+{ id:'twitch-music-45k', title:'Twitch — Music Streamer (45k)', platform:'Twitch', followers:45000, lang:'English', country:'UK', price:480, seller:'TuneHub', excerpt:'Live performances and acoustic sessions.', link:'https://socialaccounts.test/demo/twitch-music-45k' },
+
+{ id:'twitch-irl-25k', title:'Twitch — IRL Streamer (25k)', platform:'Twitch', followers:25000, lang:'French', country:'FR', price:310, seller:'DailyVibe', excerpt:'Engaging real-life streams with active chat.', link:'https://socialaccounts.test/demo/twitch-irl-25k' },
+
+{ id:'twitch-esports-100k', title:'Twitch — Esports Channel (100k)', platform:'Twitch', followers:100000, lang:'English', country:'CA', price:950, seller:'ProPlays', excerpt:'Professional tournament highlights & gaming news.', link:'https://socialaccounts.test/demo/twitch-esports-100k' },
+
+// === TWITTER (4) ===
+{ id:'twitter-tech-60k', title:'Twitter — Tech Influencer (60k)', platform:'Twitter', followers:60000, lang:'English', country:'US', price:540, seller:'TechTrends', excerpt:'Trending updates & daily tech tips.', link:'https://socialaccounts.test/demo/twitter-tech-60k' },
+
+{ id:'twitter-fashion-80k', title:'Twitter — Fashion Blogger (80k)', platform:'Twitter', followers:80000, lang:'English', country:'IT', price:680, seller:'StyleMood', excerpt:'Daily fashion content with high engagement.', link:'https://socialaccounts.test/demo/twitter-fashion-80k' },
+
+{ id:'twitter-sports-50k', title:'Twitter — Sports Updates (50k)', platform:'Twitter', followers:50000, lang:'Spanish', country:'ES', price:460, seller:'SportsLive', excerpt:'Fast updates on major sports events.', link:'https://socialaccounts.test/demo/twitter-sports-50k' },
+
+{ id:'twitter-entertainment-100k', title:'Twitter — Entertainment Hub (100k)', platform:'Twitter', followers:100000, lang:'English', country:'US', price:880, seller:'StarBuzz', excerpt:'Celebrity news, movies, and viral trends.', link:'https://socialaccounts.test/demo/twitter-entertainment-100k' },
+
+// === LINKEDIN (4) ===
+{ 
+  id:'linkedin-marketing-25k',title:'LinkedIn — Marketing Influencer (25k)',platform:'LinkedIn',followers:25000,lang:'English', country:'US', price:320, seller:'BizConnect',excerpt:'Engaged marketing community with B2B focus.',  link:'under-construction.html', paymentLink: "paymentlink"},
+
+{ 
+  id:'linkedin-tech-40k',title:'LinkedIn — Tech Creator (40k)',platform:'LinkedIn', followers:40000,lang:'English',country:'Germany',price:480,seller:'TechPulse',excerpt:'Strong engagement in startup and AI sectors.',link:'under-construction.html',paymentLink: "paymentlink"},
+
+{ 
+  id:'linkedin-finance-30k',title:'LinkedIn — Finance Expert (30k)',platform:'LinkedIn', 
+  followers:30000,lang:'English',country:'UK',price:410,seller:'FinVision',excerpt:'Trusted finance and investment audience.',link:'under-construction.html',paymentLink: "paymentlink"},
+
+{ 
+  id:'linkedin-hr-22k',title:'LinkedIn—HR Insights (22k)',platform:'LinkedIn',
+followers:22000,lang:'English',country:'Canada',price:290,seller:'WorkSphere', excerpt:'Active followers in recruitment and HR sectors.', link:'under-construction.html',paymentLink: "paymentlink"},
+];
+
+// Save to localStorage for payment page use
+localStorage.setItem("STORE_DATA", JSON.stringify(STORE));
+
+const resultsEl = document.getElementById("results");
+const drawer = document.getElementById("drawer");
+let currentItem = null;
+
+/* ===== Utilities ===== */
+function formatNumber(n) {
+  return Number(n).toLocaleString();
+}
+
+/* ===== Render Home ===== */
+function renderHome(list) {
+  resultsEl.innerHTML = list.map(p => `
+    <article class="card" data-id="${p.id}">
+      <div class="card-head">
+        <div class="platform-pill">${p.platform}</div>
+        <div>
+          <h3>${p.title}</h3>
+          <div class="meta">${formatNumber(p.followers)} followers • ${p.lang}</div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:10px">${p.excerpt}</p>
+      <div class="card-foot">
+        <div><div class="price">$${p.price}</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="small-btn test-btn" data-link="${p.link}">Test</button>
+          <button class="btn-cta view-btn" data-id="${p.id}">View</button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  // Bind events
+  document.querySelectorAll('.view-btn').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    openDrawer(e.target.dataset.id);
+  });
+
+  document.querySelectorAll('.test-btn').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    window.open(e.target.dataset.link, '_blank');
+  });
+
+  document.querySelectorAll('.card').forEach(c => c.onclick = () => openDrawer(c.dataset.id));
+}
+
+renderHome(STORE);
+
+/* ===== Drawer ===== */
+function openDrawer(id) {
+  const item = STORE.find(x => x.id === id);
+  if (!item) return;
+  currentItem = item;
+
+  document.getElementById('drawerTitle').textContent = item.title;
+  document.getElementById('drawerMeta').textContent = `${formatNumber(item.followers)} followers • ${item.lang} • ${item.country}`;
+  document.getElementById('drawerSeller').textContent = item.seller;
+  document.getElementById('drawerDesc').textContent = item.excerpt;
+  document.getElementById('drawerPrice').textContent = `$${item.price}`;
+  document.getElementById('drawerGallery').textContent = `${item.platform} • analytics preview`;
+
+  drawer.classList.add('open');
+}
+
+function closeDrawer() {
+  drawer.classList.remove('open');
+  currentItem = null;
+}
+
+function openTestAccount() {
+  if (currentItem && currentItem.link) window.open(currentItem.link, '_blank');
+}
+
+/* ===== Payment Page Redirect ===== */
+function startStripe() {
+  if (!currentItem) return alert('Please select an account first.');
+  const params = new URLSearchParams({
+    id: currentItem.id,
+    title: currentItem.title,
+    price: currentItem.price,
+    seller: currentItem.seller,
+    platform: currentItem.platform,
+    followers: currentItem.followers,
+    lang: currentItem.lang,
+    country: currentItem.country
+  });
+  window.location.href = `payment.html?${params.toString()}`;
+}
+
+/* ===== Search & Filters ===== */
+function runSearch() {
+  const term = document.getElementById('searchInput').value.trim().toLowerCase();
+  const platform = document.getElementById('searchPlatform').value;
+  const results = STORE.filter(item => {
+    const matchTerm =
+      item.title.toLowerCase().includes(term) ||
+      item.excerpt.toLowerCase().includes(term) ||
+      item.seller.toLowerCase().includes(term);
+    const matchPlatform = !platform || item.platform === platform;
+    return matchTerm && matchPlatform;
+  });
+  renderHome(results);
+  if (results.length === 0) {
+    resultsEl.innerHTML = `<p style="color:var(--muted)">No results found for "${term}".</p>`;
+  }
+}
+document.getElementById('searchInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') runSearch();
+});
+
+function applyFilter(p) {
+  renderHome(STORE.filter(x => x.platform === p));
+}
+
+/* ===== Navigation & Theme ===== */
+function goHome(e) { e.preventDefault(); renderHome(STORE); }
+function goSell(e) { e.preventDefault(); alert('Seller onboarding placeholder.'); }
+function openSell() { alert('Seller listing placeholder.'); }
+
+const themeToggle = document.getElementById('themeToggle');
+function applyTheme(t) {
+  document.documentElement.classList.toggle('dark', t === 'dark');
+  themeToggle.textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('site-theme', t);
+}
+themeToggle.onclick = () => applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+applyTheme(localStorage.getItem('site-theme') || 'light');
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</script>
+<!-- ===== MM INDUSTRY WELCOME POPUP ===== -->
+<div id="welcomePopup" class="popup-overlay">
+  <div class="popup-box">
+   
+
+    <!-- Welcome Message -->
+    <h2>👋 WELCOME TO INTERNATIONAL ACCOUNTS</h2>
+    <p>
+      We’re excited to have you here! Explore the latest innovations, services, and updates shaping the future of internet.
+    </p>
+
+    <!-- Latest Updates -->
+    <div class="updates-box">
+      <h3>🔔 Latest Updates</h3>
+      <ul>
+        <li>🚀 New updated accounts Launching Soon</li>
+        <li>🌱 Upgraded accounts 99% </li>
+        <li>🤝 Partnership Opportunities Open — Join Us</li>
+      </ul>
+    </div>
+
+    <!-- Security reCAPTCHA -->
+    <div class="captcha-section">
+      <p>Please verify you’re not a robot:</p>
+      <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="enableContinue"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="popup-buttons">
+      <button id="closePopupBtn" disabled>Continue to Site</button>
+     
+    </div>
+  </div>
+</div>
+
+<!-- ===== Google reCAPTCHA Script ===== -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<!-- ===== Popup Script ===== -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("welcomePopup");
+    const closeBtn = document.getElementById("closePopupBtn");
+
+    // Show popup after short delay
+    setTimeout(() => {
+      popup.style.display = "flex";
+    }, 1000);
+
+    // Enable Continue button after reCAPTCHA verification
+    window.enableContinue = function() {
+      closeBtn.disabled = false;
+      closeBtn.style.background = "#004aad";
+      closeBtn.style.cursor = "pointer";
+    };
+
+    // Close popup
+    closeBtn.addEventListener("click", () => {
+      popup.style.opacity = "0";
+      setTimeout(() => (popup.style.display = "none"), 500);
+    });
+  });
+</script>
+
+<!-- ===== Popup Styles ===== -->
+<style>
+  .popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.5s ease;
+  }
+
+  .popup-box {
+    background: #fff;
+    padding: 30px 35px;
+    border-radius: 12px;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,0,0,0.25);
+    border-top: 4px solid #004aad;
+    font-family: "Segoe UI", Arial, sans-serif;
+    animation: slideDown 0.6s ease;
+  }
+
+  @keyframes slideDown {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .popup-logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 74, 173, 0.4);
+  }
+
+  .popup-box h2 {
+    margin-top: 0;
+    color: #004aad;
+    font-size: 20px;
+  }
+
+  .popup-box p {
+    color: #333;
+    font-size: 14px;
+    margin: 10px 0 20px;
+    line-height: 1.6;
+  }
+
+  .updates-box {
+    text-align: left;
+    background: #f5f7fb;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+  }
+
+  .updates-box h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #004aad;
+  }
+
+  .updates-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .updates-box ul li {
+    margin-bottom: 6px;
+  }
+
+  .captcha-section {
+    margin: 10px 0 15px;
+  }
+
+  .popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #closePopupBtn {
+    background: #ccc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+  }
+
+  #closePopupBtn:hover:enabled {
+    background: #0066ff;
+  }
+
+  .view-updates-btn {
+    display: inline-block;
+    background: #004aad;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .view-updates-btn:hover {
+    background: #ff6a00;
+  }
+</style>
+<!-- ===== ACCOUNT APPEAL FORM (DIRECT WHATSAPP + PAYMENT CONFIRMATION) ===== -->
+<div id="appealWidget" style="max-width:980px;margin:30px auto;padding:18px;border:1px solid #d7d9dd;border-radius:8px;background:#fff;">
+  <h3 style="margin:0 0 10px;color:#004aad;">Account Recovery Appeal</h3>
+  <p style="margin:0 0 12px;color:#333">
+    Fill the form, click <strong>Submit & Pay</strong>, complete payment, then your appeal info will be sent to WhatsApp with payment confirmation.
+  </p>
+
+  <form id="appealForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+    <input name="fullName" placeholder="Full name" required style="padding:10px;border:1px solid #ccc;border-radius:6px" />
+    <input name="email" type="email" placeholder="Email (used on account)" required style="padding:10px;border:1px solid #ccc;border-radius:6px" />
+    <input name="phone" placeholder="Phone (optional)" style="padding:10px;border:1px solid #ccc;border-radius:6px" />
+    <input name="accountId" placeholder="Account ID / Username" required style="padding:10px;border:1px solid #ccc;border-radius:6px" />
+    <textarea name="reason" placeholder="Explain how you lost access (brief)" required style="grid-column:1/ -1; padding:10px;border:1px solid #ccc;border-radius:6px;min-height:90px"></textarea>
+
+    <label style="grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:#444">
+      <input type="checkbox" id="appealAgree" required/> I agree to pay $1 for the appeal and understand approval is subject to verification.
+    </label>
+
+    <div style="grid-column:1/-1;display:flex;gap:10px;justify-content:flex-start;align-items:center;">
+      <button id="submitPayBtn" type="submit" style="background:#004aad;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer">
+        Submit & Pay $1
+      </button>
+      <div id="appealMessage" style="margin-left:auto;color:#666;font-size:13px"></div>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  const form = document.getElementById('appealForm');
+  const submitBtn = document.getElementById('submitPayBtn');
+  const messageEl = document.getElementById('appealMessage');
+
+  const whatsappNumber = '0745601101'; // Updated WhatsApp number
+  const paymentBaseLink = 'https://payments.munopay.com/pay?id=dab695e5ebfca17f'; // Updated payment link
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Redirecting...';
+    messageEl.textContent = '';
+
+    const data = {
+      fullName: form.fullName.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim(),
+      accountId: form.accountId.value.trim(),
+      reason: form.reason.value.trim(),
+      agreed: !!document.getElementById('appealAgree').checked
+    };
+
+    // Validate required fields
+    if (!data.fullName || !data.email || !data.accountId || !data.reason || !data.agreed) {
+      messageEl.textContent = 'Please fill all required fields and agree to the terms.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit & Pay $1';
+      return;
+    }
+
+    // Encode appeal info for WhatsApp
+    const createWhatsappLink = (status) => {
+      const msg = encodeURIComponent(
+        `New Account Appeal Submission:\n\n` +
+        `Full Name: ${data.fullName}\n` +
+        `Email: ${data.email}\n` +
+        `Phone: ${data.phone || 'N/A'}\n` +
+        `Account ID: ${data.accountId}\n` +
+        `Reason: ${data.reason}\n` +
+        `Payment Status: ${status}`
+      );
+      return `https://wa.me/${whatsappNumber}?text=${msg}`;
+    };
+
+    // Open payment page
+    window.open(paymentBaseLink, '_blank');
+
+    messageEl.textContent = 'After completing payment, your appeal info will be sent to WhatsApp.';
+
+    // Optional: detect if redirected after payment
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success' && urlParams.get('name') === data.fullName) {
+      // Payment confirmed, send WhatsApp
+      window.open(createWhatsappLink('Confirmed'), '_blank');
+      messageEl.textContent = 'Payment confirmed! WhatsApp message sent.';
+    }
+  });
+})();
+</script>
+
+<!-- 🌐 MM INDUSTRY Global Site Lock (Firebase + Draggable Admin Panel) -->
+<script type="module">
+/*
+  ⚙️ SETUP INSTRUCTIONS
+  ---------------------
+  1️⃣ Replace adminIP with your IP.
+  2️⃣ Locking and unlocking will now affect all users globally.
+  3️⃣ Uses Firebase Realtime Database.
+*/
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+// ======== CONFIGURE ========
+const adminIP = "197.239.11.160"; // Your IP
+const firebaseConfig = {
+  apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+  authDomain: "markmellon-in.firebaseapp.com",
+  databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+  projectId: "markmellon-in",
+  storageBucket: "markmellon-in.firebasestorage.app",
+  messagingSenderId: "503954320627",
+  appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+  measurementId: "G-S66KTPXQPE"
+};
+// =============================
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const lockRef = ref(db, "globalSiteLock");
+
+// === Helper: Get visitor IP ===
+async function getUserIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip;
+  } catch {
+    return null;
+  }
+}
+
+// === Overlay Display ===
+function showLockOverlay(lockPassword) {
+  if (!lockPassword || lockPassword === "None") return;
+
+  if (sessionStorage.getItem("tempUnlock") === lockPassword) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "siteLockOverlay";
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.85);
+    display:flex;align-items:center;justify-content:center;
+    z-index:999999;backdrop-filter:blur(4px);padding:20px;box-sizing:border-box;
+  `;
+
+  const box = document.createElement("div");
+  box.style.cssText = `
+    max-width:420px;width:100%;background:#fff;border-radius:10px;
+    padding:22px;box-shadow:0 10px 30px rgba(0,0,0,0.4);text-align:center;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  `;
+
+  box.innerHTML = `
+    <h2 style="margin:0 0 10px;font-size:20px;color:#111;">Site Locked</h2>
+    <p style="margin:0 0 16px;color:#444;font-size:14px;">Enter the password to continue.</p>
+    <input id="lockInput" type="password" placeholder="Password" style="width:100%;padding:10px 12px;font-size:15px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
+    <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;">
+      <button id="unlockBtn" style="padding:9px 14px;border:none;border-radius:8px;cursor:pointer;background:#0a84ff;color:#fff;font-size:14px;">Unlock</button>
+      <button id="leaveBtn" style="padding:9px 14px;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:#fff;color:#111;font-size:14px;">Leave site</button>
+    </div>
+    <div id="lockMsg" style="margin-top:12px;font-size:13px;color:#b00020;min-height:18px;"></div>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  const input = box.querySelector("#lockInput");
+  const unlockBtn = box.querySelector("#unlockBtn");
+  const leaveBtn = box.querySelector("#leaveBtn");
+  const msg = box.querySelector("#lockMsg");
+
+  input.focus();
+
+  function tryUnlock() {
+    const val = input.value.trim();
+    if (!val) {
+      msg.textContent = "Please enter the password.";
+      return;
+    }
+    if (val === lockPassword) {
+      sessionStorage.setItem("tempUnlock", lockPassword);
+      overlay.remove();
+    } else {
+      msg.textContent = "Incorrect password — try again.";
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  unlockBtn.onclick = tryUnlock;
+  input.addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+  leaveBtn.onclick = () => { window.location.href = "about:blank"; };
+}
+
+// === Admin Panel ===
+function showAdminPanel(currentPassword, enabled) {
+  if (document.getElementById("siteLockAdmin")) return;
+
+  const panel = document.createElement("div");
+  panel.id = "siteLockAdmin";
+  panel.style.cssText = `
+    position:fixed;bottom:18px;left:18px;background:#fff;border:1px solid #ddd;
+    box-shadow:0 6px 20px rgba(0,0,0,0.12);border-radius:10px;padding:12px;
+    z-index:1000000;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    min-width:220px;cursor:move;
+  `;
+
+  panel.innerHTML = `
+    <div style="font-weight:700;color:#004aad;margin-bottom:8px;">Global Site Lock</div>
+    <div style="font-size:12px;color:#333;margin-bottom:8px;">Status: <span id="lockStatus">${enabled ? "LOCKED" : "OPEN"}</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <input id="lockPassInput" type="text" placeholder="Password (None to open)" style="flex:1;padding:6px;border:1px solid #ccc;border-radius:6px;font-size:13px" value="${currentPassword || ""}">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:space-between;">
+      <button id="lockSetBtn" style="background:#0a84ff;color:white;border:none;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:13px">Set & Lock</button>
+      <button id="lockDisableBtn" style="background:#e2e8f0;color:#111;border:none;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:13px">Disable</button>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#666">
+      <button id="tempUnlockBtn" style="background:transparent;border:none;color:#0a84ff;cursor:pointer;padding:0;font-size:12px">Unlock this browser</button>
+    </div>
+  `;
+
+  document.body.appendChild(panel);
+
+  const passInput = panel.querySelector("#lockPassInput");
+  const statusEl = panel.querySelector("#lockStatus");
+
+  // Lock button
+  panel.querySelector("#lockSetBtn").onclick = async () => {
+    const newPass = passInput.value.trim() || "None";
+    await set(lockRef, { enabled: newPass !== "None", password: newPass });
+    alert("✅ Site locked with password (global).");
+  };
+
+  // Disable button
+  panel.querySelector("#lockDisableBtn").onclick = async () => {
+    await set(lockRef, { enabled: false, password: "None" });
+    alert("✅ Site unlocked globally.");
+  };
+
+  // Temp unlock this browser
+  panel.querySelector("#tempUnlockBtn").onclick = async () => {
+    const snap = await get(lockRef);
+    const val = snap.val();
+    if (val?.password && val.password !== "None") {
+      sessionStorage.setItem("tempUnlock", val.password);
+      alert("🔓 Temporarily unlocked this browser.");
+      const overlay = document.getElementById("siteLockOverlay");
+      if (overlay) overlay.remove();
+    } else {
+      alert("Site is not locked.");
+    }
+  };
+
+  // Dragging support
+  let isDragging = false;
+  let offsetX = 0, offsetY = 0;
+
+  panel.addEventListener("mousedown", e => {
+    isDragging = true;
+    const rect = panel.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    panel.style.top = rect.top + "px";
+    panel.style.bottom = "auto";
+  });
+
+  document.addEventListener("mousemove", e => {
+    if (!isDragging) return;
+    panel.style.left = `${e.clientX - offsetX}px`;
+    panel.style.top = `${e.clientY - offsetY}px`;
+  });
+
+  document.addEventListener("mouseup", () => (isDragging = false));
+}
+
+// === MAIN ===
+(async () => {
+  const userIP = await getUserIP();
+
+  // Listen for global lock updates
+  onValue(lockRef, snapshot => {
+    const data = snapshot.val() || { enabled: false, password: "None" };
+    const { enabled, password } = data;
+
+    // Admin panel (only for your IP)
+    if (userIP === adminIP) {
+      showAdminPanel(password, enabled);
+    }
+
+    // Site lock for visitors
+    if (enabled && userIP !== adminIP) {
+      showLockOverlay(password);
+    } else {
+      const existing = document.getElementById("siteLockOverlay");
+      if (existing) existing.remove();
+    }
+  });
+})();
+</script>
+
+
+<!-- 🌐 ANALYTICS + COMMENTS + ADVANCED ADMIN PANEL -->
+<div id="analyticsWidget" style="max-width:880px;margin:40px auto;padding:22px;border-radius:14px;background:#ffffff;box-shadow:0 4px 16px rgba(0,0,0,0.08);font-family:'Poppins',sans-serif;color:#222;line-height:1.5;">
+  <h2 style="margin:0 0 10px;color:#004aad;font-size:22px;text-align:center;">📊 Website Analytics & Comments</h2>
+  <p style="text-align:center;margin:0 0 18px;color:#555;">Monitor total visitors, online users, and comments live.</p>
+  
+  <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:18px;">
+    <div class="statBox">
+      <h4>👥 Total Visitors</h4>
+      <p id="visitorCount">0</p>
+    </div>
+    <div class="statBox">
+      <h4>🟢 Currently Online</h4>
+      <p id="onlineCount">0</p>
+    </div>
+  </div>
+
+  <hr style="border:none;border-top:1px solid #ddd;margin:18px 0;">
+
+  <h3 style="color:#004aad;margin-bottom:8px;">💬 Community Comments</h3>
+  <div id="commentsList" style="max-height:260px;overflow-y:auto;margin-bottom:12px;padding-right:6px;"></div>
+
+  <div style="display:flex;align-items:center;gap:8px;">
+    <input type="text" id="commentInput" placeholder="Write a comment..." style="flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:14px;">
+    <button id="addCommentBtn" style="background:#004aad;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:500;">Post</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL (FLOATING, IP-RESTRICTED) -->
+<div id="adminPanel" style="position:fixed;top:20px;right:20px;background:#004aad;color:white;padding:14px 18px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:none;z-index:9999;max-width:250px;">
+  <h4 style="margin:0 0 10px;font-size:15px;">🛠 Admin Panel</h4>
+  <button onclick="resetVisitors()" style="background:#fff;color:#004aad;border:none;padding:6px 10px;border-radius:8px;margin-bottom:6px;cursor:pointer;width:100%;">Reset Visitors</button>
+  <button onclick="clearComments()" style="background:#fff;color:#004aad;border:none;padding:6px 10px;border-radius:8px;margin-bottom:6px;cursor:pointer;width:100%;">Clear Comments</button>
+  <h5 style="margin-top:10px;margin-bottom:4px;font-size:14px;">👤 Online Users</h5>
+  <div id="onlineUsersList" style="max-height:200px;overflow-y:auto;background:#003685;padding:6px;border-radius:8px;"></div>
+</div>
+
+<style>
+.statBox {background:#f5f7ff;border:1px solid #d9e1ff;border-radius:10px;flex:1 1 220px;text-align:center;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.statBox h4 {color:#004aad;margin:0 0 6px;font-size:15px;}
+.statBox p {font-size:18px;font-weight:600;margin:0;}
+#commentsList div {background:#f8faff;border:1px solid #e3e6f0;border-radius:8px;margin-bottom:8px;padding:8px 10px;font-size:14px;display:flex;justify-content:space-between;align-items:center;}
+.deleteBtn {background:none;border:none;color:#d00;font-weight:bold;cursor:pointer;}
+.editBtn {background:none;border:none;color:#008000;font-weight:bold;cursor:pointer;margin-right:6px;}
+#commentInput:focus {border-color:#004aad;outline:none;box-shadow:0 0 4px rgba(0,74,173,0.3);}
+#addCommentBtn:hover {background:#003685;}
+.onlineUser {display:flex;justify-content:space-between;margin-bottom:4px;padding:4px 6px;background:#00295b;border-radius:6px;font-size:13px;}
+.kickBtn {background:#d00;border:none;color:white;font-size:12px;padding:2px 5px;border-radius:4px;cursor:pointer;}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+  authDomain: "markmellon-in.firebaseapp.com",
+  databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+  projectId: "markmellon-in",
+  storageBucket: "markmellon-in.firebasestorage.app",
+  messagingSenderId: "503954320627",
+  appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+  measurementId: "G-S66KTPXQPE"
+};
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const visitorEl = document.getElementById('visitorCount');
+const onlineEl = document.getElementById('onlineCount');
+const commentsListEl = document.getElementById('commentsList');
+const commentInput = document.getElementById('commentInput');
+const addCommentBtn = document.getElementById('addCommentBtn');
+
+const visitorsRef = db.ref('analytics/visitors');
+const totalCountRef = db.ref('analytics/totalCount');
+const onlineRef = db.ref('analytics/onlineUsers');
+const commentsRef = db.ref('comments');
+
+let visitorID = localStorage.getItem('visitor_id');
+if(!visitorID){
+  visitorID = 'v_' + Math.random().toString(36).substr(2,9);
+  localStorage.setItem('visitor_id', visitorID);
+  visitorsRef.child(visitorID).set({joinedAt: Date.now()});
+  totalCountRef.transaction(count => (count||0)+1);
+}
+
+function updateOnline(){ onlineRef.child(visitorID).set(Date.now()); }
+updateOnline();
+setInterval(updateOnline,30000);
+window.addEventListener('beforeunload',()=>{onlineRef.child(visitorID).remove();});
+
+totalCountRef.on('value',snap=>{visitorEl.textContent = snap.val()||0;});
+onlineRef.on('value',snap=>{
+  const now=Date.now(); let count=0;
+  snap.forEach(c=>{if(now-c.val()<3*60*1000) count++;});
+  onlineEl.textContent=count;
+  renderOnlineUsers(snap.val()||{});
+});
+
+// === COMMENTS ===
+function renderComments(data){
+  commentsListEl.innerHTML='';
+  Object.entries(data).forEach(([key,text])=>{
+    const div=document.createElement('div');
+    div.textContent = `💬 ${text}`;
+    if(window.isAdmin){
+      const editBtn=document.createElement('button');
+      editBtn.textContent='✎';
+      editBtn.className='editBtn';
+      editBtn.onclick=()=>{
+        const newText=prompt("Edit comment:",text);
+        if(newText) commentsRef.child(key).set(newText);
+      };
+      const delBtn=document.createElement('button');
+      delBtn.textContent='×';
+      delBtn.className='deleteBtn';
+      delBtn.onclick=()=>commentsRef.child(key).remove();
+      div.appendChild(editBtn);
+      div.appendChild(delBtn);
+    }
+    commentsListEl.appendChild(div);
+  });
+}
+commentsRef.on('value',snap=>{renderComments(snap.val()||{});});
+
+addCommentBtn.onclick=()=>{
+  const text=commentInput.value.trim();
+  if(!text) return;
+  commentsRef.push(text);
+  commentInput.value='';
+};
+commentInput.addEventListener('keydown',e=>{if(e.key==='Enter') addCommentBtn.click();});
+
+// === ADMIN FUNCTIONS ===
+function resetVisitors(){
+  if(confirm("Reset all visitor stats?")){
+    visitorsRef.remove();
+    onlineRef.remove();
+    totalCountRef.set(0);
+    alert("✅ Visitor stats reset.");
+  }
+}
+function clearComments(){
+  if(confirm("Delete all comments?")){
+    commentsRef.remove();
+    alert("🧹 All comments cleared.");
+  }
+}
+
+// === ONLINE USERS LIST (ADMIN ONLY) ===
+function renderOnlineUsers(users){
+  const onlineDiv = document.getElementById('onlineUsersList');
+  onlineDiv.innerHTML='';
+  if(!window.isAdmin) return;
+  Object.entries(users).forEach(([id,timestamp])=>{
+    const div=document.createElement('div');
+    div.className='onlineUser';
+    const time = new Date(timestamp).toLocaleTimeString();
+    div.textContent = `${id} (${time})`;
+    const kickBtn=document.createElement('button');
+    kickBtn.textContent='Kick';
+    kickBtn.className='kickBtn';
+    kickBtn.onclick=()=>{ onlineRef.child(id).remove(); };
+    div.appendChild(kickBtn);
+    onlineDiv.appendChild(div);
+  });
+}
+
+// === ADMIN PANEL VISIBILITY BY IP ===
+fetch('https://api.ipify.org?format=json')
+.then(res=>res.json())
+.then(data=>{
+  if(data.ip==="197.239.11.160"){
+    window.isAdmin=true;
+    document.getElementById('adminPanel').style.display='block';
+  }
+});
+</script>
+
+
+<!-- 🛠️ MM INDUSTRY Maintenance System v7 (Firebase Global + Countdown + Admin Panel) -->
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+// ========================
+// ⚙️ SETTINGS
+// ========================
+const adminIP = "197.239.11.160";         // Your IP address
+const overridePassword = "Secret123";   // Bypass password
+const panelPassword = "markmellon";     // Admin control panel
+const countdownHours = 1;               // Countdown time
+const countdownMinutes = 0;
+
+// Firebase configuration (YOUR CONFIG)
+const firebaseConfig = {
+  apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+  authDomain: "markmellon-in.firebaseapp.com",
+  databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+  projectId: "markmellon-in",
+  storageBucket: "markmellon-in.firebasestorage.app",
+  messagingSenderId: "503954320627",
+  appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+  measurementId: "G-S66KTPXQPE"
+};
+
+// ========================
+// Initialize Firebase
+// ========================
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const maintenanceRef = ref(db, 'maintenanceStatus');
+
+// ========================
+// Countdown setup
+// ========================
+let maintenanceEnd = Date.now() + (countdownHours * 60 + countdownMinutes) * 60 * 1000;
+
+// ========================
+// Get visitor IP
+// ========================
+async function getUserIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip;
+  } catch {
+    return null;
+  }
+}
+
+// ========================
+// Maintenance Page Display
+// ========================
+function showMaintenance() {
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#f5f7fa,#e2e7f5);
+      font-family:'Poppins',sans-serif;
+      text-align:center;
+      color:#222;
+      padding:20px;
+    ">
+      <h1 style="font-size:32px;color:#004aad;margin-bottom:12px;">MM INDUSTRY</h1>
+      <h2 style="font-size:22px;margin-bottom:10px;">🛠️ Website Under Maintenance</h2>
+      <p style="font-size:16px;margin-bottom:8px;">
+        We’re currently upgrading our systems to serve you better.<br>
+        Please check back soon.
+      </p>
+      <p id="timer" style="font-size:18px;font-weight:600;color:#004aad;margin:10px 0;"></p>
+      <button onclick="location.reload()" style="
+        background:#004aad;
+        color:#fff;
+        border:none;
+        padding:10px 22px;
+        border-radius:8px;
+        cursor:pointer;
+        font-size:15px;
+        font-weight:500;
+        margin-top:10px;
+      ">🔄 Refresh Page</button>
+      <p style="font-size:13px;margin-top:18px;color:#555;">© ${new Date().getFullYear()} MM INDUSTRY. All rights reserved.</p>
+    </div>
+  `;
+
+  const timer = document.getElementById("timer");
+  const interval = setInterval(() => {
+    const remaining = maintenanceEnd - Date.now();
+    if (remaining <= 0) {
+      clearInterval(interval);
+      timer.textContent = "✅ Maintenance complete — refresh to access the site!";
+      return;
+    }
+    const h = Math.floor(remaining / (1000 * 60 * 60));
+    const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((remaining % (1000 * 60)) / 1000);
+    timer.textContent = `🕒 Site will be back in ${h}h ${m}m ${s}s`;
+  }, 1000);
+}
+
+// ========================
+// Admin Control Panel
+// ========================
+function showAdminPanel(currentStatus) {
+  const box = document.createElement("div");
+  box.innerHTML = `
+    <div style="
+      position:fixed;
+      bottom:18px;
+      right:18px;
+      background:#fff;
+      border:1px solid #ccc;
+      box-shadow:0 2px 10px rgba(0,0,0,0.15);
+      border-radius:10px;
+      padding:14px 18px;
+      font-family:'Poppins',sans-serif;
+      z-index:9999;
+    ">
+      <h4 style="margin:0 0 10px;color:#004aad;">⚙️ Maintenance Control</h4>
+      <p style="margin:0 0 10px;font-size:14px;color:#333;">
+        Status: <b id="maintStatus">${currentStatus}</b>
+      </p>
+      <button id="onBtn" style="
+        background:#ff4747;color:white;border:none;
+        border-radius:6px;padding:6px 10px;margin-right:5px;cursor:pointer;
+      ">Enable Maintenance</button>
+      <button id="offBtn" style="
+        background:#007bff;color:white;border:none;
+        border-radius:6px;padding:6px 10px;cursor:pointer;
+      ">Disable Maintenance</button>
+    </div>
+  `;
+  document.body.appendChild(box);
+
+  document.getElementById("onBtn").onclick = () => {
+    set(maintenanceRef, "On");
+    document.getElementById("maintStatus").textContent = "On";
+    alert("✅ Maintenance mode ENABLED");
+    location.reload();
+  };
+  document.getElementById("offBtn").onclick = () => {
+    set(maintenanceRef, "None");
+    document.getElementById("maintStatus").textContent = "None";
+    alert("✅ Maintenance mode DISABLED");
+    location.reload();
+  };
+}
+
+// ========================
+// Main Script
+// ========================
+(async () => {
+  const userIP = await getUserIP();
+
+  // Listen for maintenance status changes
+  onValue(maintenanceRef, (snapshot) => {
+    const maintenanceMode = snapshot.val() || "None";
+
+    // Show maintenance page for non-admin users
+    if (maintenanceMode === "On" && userIP !== adminIP) {
+      const access = prompt("🚧 MM INDUSTRY is under maintenance.\nEnter password to continue:");
+      if (access !== overridePassword) {
+        showMaintenance();
+      }
+    }
+
+    // Admin panel for your IP
+    if (userIP === adminIP) {
+      const pass = prompt("🔐 Enter Admin Panel Password:");
+      if (pass === panelPassword) {
+        showAdminPanel(maintenanceMode);
+      }
+    }
+  });
+})();
+</script>
+
+<!-- 🔹 TOP-LEFT USER PROFILE DISPLAY (Dynamic First Letter) -->
+<div id="profileMiniBox" style="
+  position: fixed; top: 20px; left: 20px;
+  background: #00b4db;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  user-select: none;
+  font-size: 22px;
+  transition: transform 0.3s ease, background 0.3s ease;
+">
+  <span id="miniLetter">U</span>
+</div>
+
+<div id="profilePanel" style="
+  position: fixed; top: 20px; left: 20px;
+  background: rgba(0,0,0,0.9);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  width: 300px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  transform: translateX(-350px);
+  transition: transform 0.4s ease;
+  z-index: 999;
+">
+  <div style="text-align:center;">
+    <h2 style="margin:0 0 12px 0; font-size:20px;">Profile</h2>
+    <input type="text" id="panelFirstName" placeholder="First Name" style="
+      width:90%; margin:6px 0; padding:8px; border-radius:6px; border:none;
+      font-size:15px; text-align:center;">
+    <input type="text" id="panelLastName" placeholder="Last Name" style="
+      width:90%; margin:6px 0; padding:8px; border-radius:6px; border:none;
+      font-size:15px; text-align:center;">
+    <p id="panelEmail" style="margin:10px 0; font-size:0.9em; color:#ccc;"></p>
+    <button id="panelSaveBtn" style="
+      width:90%; margin:6px 0; padding:10px; border:none; border-radius:6px;
+      background:#00b4db; color:white; cursor:pointer; font-weight:600;
+      font-size:14px;">Save</button>
+    <button id="panelEnterBtn" style="
+      width:90%; margin:6px 0; padding:10px; border:none; border-radius:6px;
+      background:#004aad; color:white; cursor:pointer; font-weight:600;
+      font-size:14px;">Enter Main Website</button>
+    <button id="panelLogoutBtn" style="
+      width:90%; margin:6px 0; padding:10px; border:none; border-radius:6px;
+      background:crimson; color:white; cursor:pointer; font-weight:600;
+      font-size:14px;">Logout</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBoAbyipyqVGW5F-MX33luVmPqzbb_uVLE",
+  authDomain: "markmellon-1f7a0.firebaseapp.com",
+  databaseURL: "https://markmellon-1f7a0-default-rtdb.firebaseio.com",
+  projectId: "markmellon-1f7a0",
+  storageBucket: "markmellon-1f7a0.firebasestorage.app",
+  messagingSenderId: "191098401853",
+  appId: "1:191098401853:web:5d3ed2f18e29cad526a654",
+  measurementId: "G-9EJEJPC72Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// DOM elements
+const miniBox = document.getElementById("profileMiniBox");
+const miniLetter = document.getElementById("miniLetter");
+const panel = document.getElementById("profilePanel");
+const panelFirst = document.getElementById("panelFirstName");
+const panelLast = document.getElementById("panelLastName");
+const panelEmail = document.getElementById("panelEmail");
+const panelSave = document.getElementById("panelSaveBtn");
+const panelLogout = document.getElementById("panelLogoutBtn");
+const panelEnter = document.getElementById("panelEnterBtn");
+
+let currentUser = null;
+let panelVisible = false;
+
+// Load user data
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index1.html";
+    return;
+  }
+  currentUser = user;
+
+  const docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    panelFirst.value = data.firstName || "";
+    panelLast.value = data.lastName || "";
+    panelEmail.textContent = user.email;
+    miniLetter.textContent = (data.firstName?.charAt(0).toUpperCase()) || "U";
+  } else {
+    panelEmail.textContent = user.email;
+    miniLetter.textContent = "U";
+  }
+});
+
+// Toggle panel slide
+miniBox.addEventListener("click", () => {
+  panelVisible = !panelVisible;
+  panel.style.transform = panelVisible ? "translateX(0)" : "translateX(-350px)";
+});
+
+// Click outside to close panel
+document.addEventListener("click", (e) => {
+  if (panelVisible && !panel.contains(e.target) && !miniBox.contains(e.target)) {
+    panelVisible = false;
+    panel.style.transform = "translateX(-350px)";
+  }
+});
+
+// Live update mini letter
+panelFirst.addEventListener("input", () => {
+  miniLetter.textContent = panelFirst.value?.charAt(0).toUpperCase() || "U";
+});
+
+// Save profile updates
+panelSave.addEventListener("click", async () => {
+  if (!currentUser) return;
+  try {
+    await setDoc(doc(db, "users", currentUser.uid), {
+      firstName: panelFirst.value.trim(),
+      lastName: panelLast.value.trim()
+    }, { merge: true });
+    alert("Profile updated!");
+  } catch (err) {
+    alert("Error saving profile.");
+  }
+});
+
+// Enter main website
+panelEnter.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+// Logout
+panelLogout.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index1.html";
+});
+</script>
+
+<!-- ======= FOOTER SECTION ======= -->
+<footer style="background:#ffffff172a;color:#e2e8f0;padding:40px 20px;font-family:system-ui,sans-serif;">
+
+  <!-- Navigation / Explore -->
+  <div style="text-align:center;margin-bottom:25px;">
+    <button onclick="window.location.href='other-sites.html'" 
+            style="background:#2563eb;color:white;padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:0.3s;">
+      🌐 See Our Other Websites
+    </button>
+  </div>
+
+  <!-- Contact & Share -->
+  <div style="text-align:center;margin-top:10px;">
+    <a href="mailto:youremail@example.com" 
+       style="display:inline-block;margin:6px 10px;padding:10px 18px;border-radius:8px;background:#1e293b;color:white;text-decoration:none;font-weight:500;transition:0.3s;"
+       onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">📧 Email Us</a>
+
+    <button id="shareBtn"
+       style="display:inline-block;margin:6px 10px;padding:10px 18px;border-radius:8px;background:#0a84ff;color:white;font-weight:500;border:none;cursor:pointer;transition:0.3s;"
+       onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🔗 Share</button>
+  </div>
+
+  <hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:30px auto;width:90%;">
+
+  <p style="text-align:center;font-size:14px;color:#94a3b8;">
+    © 2025 | Designed by 
+    <a href="https://markmellon3.github.io/Aboutmmindustry-/" style="color:#0a84ff; font-weight:bold; text-decoration:none;">
+        MM INDUSTRY STUDIOS ENTERPRISE
+    </a>
+  </p>
+</footer>
+
+<script>
+  const shareBtn = document.getElementById('shareBtn');
+
+  shareBtn.addEventListener('click', async () => {
+    const shareData = {
+      title: document.title,
+      text: 'Check out this website!',
+      url: window.location.href
+    };
+
+    // If Web Share API is supported (mostly mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        console.log('Website shared successfully');
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback: show prompt to copy URL
+      const url = window.location.href;
+      prompt('Copy this link to share:', url);
+    }
+  });
+</script>
+
+</body>
+</html>

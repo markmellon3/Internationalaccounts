@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>International Accounts - Login</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #004aad, #00b4db);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    .container {
+      width: 380px;
+      background: rgba(255,255,255,0.15);
+      padding: 35px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 10;
+    }
+    h2 { margin-bottom: 15px; font-weight: 600; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+      margin: 6px 0;
+    }
+    .toggle-pass {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .strength-msg {
+      text-align: left;
+      font-size: 12px;
+      margin-top: -4px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #fff;
+      color: #004aad;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover { background: #f0f0f0; }
+    .toggle { margin-top: 10px; color: #ffe; font-size: 14px; cursor: pointer; }
+    .hidden { display: none; }
+    .msg { margin-top: 10px; font-size: 13px; color: #ffe; }
+    #forgotPasswordLink { margin-top:5px; font-size:13px; cursor:pointer; color:yellow; }
+
+    /* LOADER */
+    #loaderOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    #loaderOverlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* POPUP */
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%) scale(0.8);
+      background: #fff;
+      color: #004aad;
+      padding: 25px 35px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 10000;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #popup.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%,-50%) scale(1);
+    }
+  </style>
+</head>
+<body>
+  <div id="loaderOverlay"><div class="spinner"></div></div>
+  <div id="popup">✅ Account created! Go back and login.</div>
+
+  <div class="container">
+    <h2>🌐 International Accounts</h2>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <div class="password-wrapper">
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <span class="toggle-pass" id="toggleLoginPass">Show</span>
+      </div>
+      <button id="loginBtn">Login</button>
+      <div id="forgotPasswordLink" class="toggle hidden">Forgot password?</div>
+      <div class="toggle" id="showSignup">Don’t have an account? Sign up</div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" class="hidden">
+      <input type="text" id="firstName" placeholder="First Name" required>
+      <input type="text" id="lastName" placeholder="Last Name" required>
+      <input type="email" id="signupEmail" placeholder="Email" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <input type="text" id="signupPassword" placeholder="Create Password" required>
+      <div class="strength-msg" id="passwordStrength"></div>
+      <input type="text" id="confirmPassword" placeholder="Confirm Password" required>
+      <button id="signupBtn">Create Account</button>
+      <div class="toggle" id="showLogin">Already have an account? Login</div>
+      
+      - - - - - - - - - - 
+    <li> NOTE: AFTER CLICKING ON (CREATE ACCOUNT) PLEASE GO BACK TO LOGIN PAGE AND ENTER YOUR NEW ACCOUNT LOGINS </li>
+    </div>
+
+    <div class="msg" id="message"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoAbyipyqVGW5F-MX33luVmPqzbb_uVLE",
+      authDomain: "markmellon-1f7a0.firebaseapp.com",
+      databaseURL: "https://markmellon-1f7a0-default-rtdb.firebaseio.com",
+      projectId: "markmellon-1f7a0",
+      storageBucket: "markmellon-1f7a0.firebasestorage.app",
+      messagingSenderId: "191098401853",
+      appId: "1:191098401853:web:5d3ed2f18e29cad526a654",
+      measurementId: "G-9EJEJPC72Y"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const msg = document.getElementById("message");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    const passwordInput = document.getElementById("signupPassword");
+    const strengthMsg = document.getElementById("passwordStrength");
+    const loader = document.getElementById("loaderOverlay");
+    const popup = document.getElementById("popup");
+
+    // TOGGLE FORMS
+    document.getElementById("showSignup").onclick = () => {
+      loginForm.classList.add("hidden");
+      signupForm.classList.remove("hidden");
+      msg.textContent = "";
+      forgotPasswordLink.classList.add("hidden");
+    };
+    document.getElementById("showLogin").onclick = () => {
+      signupForm.classList.add("hidden");
+      loginForm.classList.remove("hidden");
+      msg.textContent = "";
+      forgotPasswordLink.classList.add("hidden");
+    };
+
+    // LOGIN USER
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (!email || !password) {
+        msg.style.color = "yellow";
+        msg.textContent = "Please enter email and password.";
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "index.html";
+      } catch (error) {
+        msg.style.color = "yellow";
+        msg.textContent = "Invalid login details.";
+        forgotPasswordLink.classList.remove("hidden");
+      }
+    });
+
+    // FORGOT PASSWORD
+    forgotPasswordLink.addEventListener("click", () => {
+      window.location.href = "forgot-password.html";
+    });
+
+    // SIGNUP USER
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const phoneNum = document.getElementById("phone").value.trim();
+      const pass = document.getElementById("signupPassword").value;
+      const confirm = document.getElementById("confirmPassword").value;
+
+      if (!first || !last || !email || !phoneNum || !pass || !confirm) {
+        msg.style.color = "yellow";
+        msg.textContent = "Please fill in all fields.";
+        return;
+      }
+      if (pass !== confirm) {
+        msg.style.color = "yellow";
+        msg.textContent = "Passwords do not match!";
+        return;
+      }
+
+      loader.classList.add("active"); // show loader
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "users", userCred.user.uid), {
+          firstName: first,
+          lastName: last,
+          email: email,
+          phone: phoneNum,
+          photo: "",
+          createdAt: new Date().toISOString()
+        });
+
+        // clear signup inputs
+        document.querySelectorAll("#signupForm input").forEach(i => i.value = "");
+        loader.classList.remove("active");
+
+        // show popup
+        popup.classList.add("active");
+        setTimeout(() => {
+          popup.classList.remove("active");
+          signupForm.classList.add("hidden");
+          loginForm.classList.remove("hidden");
+        }, 3000);
+
+      } catch (err) {
+        loader.classList.remove("active");
+        msg.style.color = "yellow";
+        msg.textContent = err.message;
+      }
+    });
+
+    // PASSWORD TOGGLE
+    const loginPassInput = document.getElementById("loginPassword");
+    const toggleLoginPass = document.getElementById("toggleLoginPass");
+    toggleLoginPass.addEventListener("click", () => {
+      if (loginPassInput.type === "password") {
+        loginPassInput.type = "text";
+        toggleLoginPass.textContent = "Hide";
+      } else {
+        loginPassInput.type = "password";
+        toggleLoginPass.textContent = "Show";
+      }
+    });
+
+    // PASSWORD STRENGTH
+    passwordInput.addEventListener("input", () => {
+      const val = passwordInput.value;
+      let strength = 0;
+      if (val.length >= 6) strength++;
+      if (/[A-Z]/.test(val)) strength++;
+      if (/[0-9]/.test(val)) strength++;
+      if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+      if (strength <= 1) {
+        strengthMsg.textContent = "Weak password";
+        strengthMsg.style.color = "red";
+      } else if (strength === 2 || strength === 3) {
+        strengthMsg.textContent = "Medium password";
+        strengthMsg.style.color = "orange";
+      } else if (strength === 4) {
+        strengthMsg.textContent = "Strong password";
+        strengthMsg.style.color = "lightgreen";
+      } else {
+        strengthMsg.textContent = "";
+      }
+    });
+  </script>
+</body>
+</html>

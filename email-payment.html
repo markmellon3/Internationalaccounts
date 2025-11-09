@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Email Account Payment</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .payment-card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      color: #111;
+    }
+    .info {
+      background: #f1f3f8;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .info p {
+      margin: 6px 0;
+      font-size: 15px;
+      color: #333;
+    }
+    .input-field {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 15px;
+    }
+    button {
+      background: #0a84ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0.5rem 0;
+      width: 100%;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #006ee6;
+    }
+    .secondary {
+      background: #28a745;
+    }
+    .secondary:hover {
+      background: #1e8a3d;
+    }
+    .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="payment-card">
+    <h2>Confirm Your Payment</h2>
+
+    <div class="info">
+      <p><strong>Email Account:</strong> <span id="emailName">Loading...</span></p>
+      <p><strong>Country:</strong> <span id="emailCountry">—</span></p>
+      <p><strong>Price:</strong> <span id="emailPrice">—</span></p>
+    </div>
+
+    <input type="text" id="buyerEmail" class="input-field" placeholder="Enter your email to receive login details" />
+    <input type="text" id="buyerPhone" class="input-field" placeholder="Enter your phone number" />
+
+    <!-- Confirmation form -->
+    <form id="orderForm" action="https://formsubmit.co/youremail@example.com" method="POST" style="display:none;">
+      <input type="hidden" name="_subject" value="New Email Account Order">
+      <input type="hidden" name="Email_Account" id="formEmailAccount">
+      <input type="hidden" name="Price" id="formPrice">
+      <input type="hidden" name="Country" id="formCountry">
+      <input type="hidden" name="Buyer_Email" id="formBuyerEmail">
+      <input type="hidden" name="Buyer_Phone" id="formBuyerPhone">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://yourwebsite.com/order-success.html">
+    </form>
+
+    <button id="payNowBtn">Pay Now</button>
+    <button id="confirmOrderBtn" class="secondary disabled" disabled>Confirm Order</button>
+  </div>
+
+  <script>
+    // === Extract parameters from URL ===
+    const params = new URLSearchParams(window.location.search);
+    const emailAccount = params.get("email");
+    const price = params.get("price");
+    const paid = params.get("paid"); // added param for Pesapal return
+
+    // === Assign display info ===
+    const domainCountry = {
+      "gmail.com": "United States",
+      "yahoo.com": "Canada",
+      "outlook.com": "United Kingdom",
+      "mail.com": "Global"
+    };
+    const domain = emailAccount ? emailAccount.split("@")[1] : "";
+    const country = domainCountry[domain] || "—";
+
+    document.getElementById("emailName").textContent = emailAccount || "Unknown";
+    document.getElementById("emailPrice").textContent = price ? `$${price}` : "—";
+    document.getElementById("emailCountry").textContent = country;
+
+    const payBtn = document.getElementById("payNowBtn");
+    const confirmBtn = document.getElementById("confirmOrderBtn");
+
+    // === Payment button ===
+    payBtn.addEventListener("click", () => {
+      const buyerEmail = document.getElementById("buyerEmail").value.trim();
+      const buyerPhone = document.getElementById("buyerPhone").value.trim();
+
+      if (!buyerEmail || !buyerPhone) {
+        alert("Please enter your email and phone number before proceeding.");
+        return;
+      }
+
+      // Save buyer info for later confirmation
+      localStorage.setItem("buyerEmail", buyerEmail);
+      localStorage.setItem("buyerPhone", buyerPhone);
+      localStorage.setItem("emailAccount", emailAccount);
+      localStorage.setItem("price", price);
+      localStorage.setItem("country", country);
+
+      // Redirect to payment gateway with return URL
+      const returnURL = encodeURIComponent(`https://yourwebsite.com/confirm.html?email=${emailAccount}&price=${price}&paid=true`);
+      const paymentURL = `https://store.pesapal.com/internationalemailpayment?email=${encodeURIComponent(emailAccount)}&price=${encodeURIComponent(price)}&buyerEmail=${encodeURIComponent(buyerEmail)}&phone=${encodeURIComponent(buyerPhone)}&return=${returnURL}`;
+      window.location.href = paymentURL;
+    });
+
+    // === If returned from Pesapal after payment ===
+    if (paid === "true") {
+      const buyerEmail = localStorage.getItem("buyerEmail");
+      const buyerPhone = localStorage.getItem("buyerPhone");
+
+      if (buyerEmail && buyerPhone) {
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove("disabled");
+        document.getElementById("buyerEmail").value = buyerEmail;
+        document.getElementById("buyerPhone").value = buyerPhone;
+      }
+    }
+
+    // === Confirm Order Button ===
+    confirmBtn.addEventListener("click", () => {
+      if (confirmBtn.disabled) return;
+
+      const buyerEmail = localStorage.getItem("buyerEmail");
+      const buyerPhone = localStorage.getItem("buyerPhone");
+      const emailAccount = localStorage.getItem("emailAccount");
+      const price = localStorage.getItem("price");
+      const country = localStorage.getItem("country");
+
+      document.getElementById("formEmailAccount").value = emailAccount;
+      document.getElementById("formPrice").value = `$${price}`;
+      document.getElementById("formCountry").value = country;
+      document.getElementById("formBuyerEmail").value = buyerEmail;
+      document.getElementById("formBuyerPhone").value = buyerPhone;
+
+      document.getElementById("orderForm").submit();
+
+      // Clear storage
+      localStorage.clear();
+    });
+  </script>
+
+</body>
+</html>
