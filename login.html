@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>International Accounts - Login</title>
   <style>
     body {
@@ -104,44 +104,19 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
-    /* POPUP */
-    #popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%) scale(0.8);
-      background: #fff;
-      color: #004aad;
-      padding: 25px 35px;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: 500;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      opacity: 0;
-      visibility: hidden;
-      z-index: 10000;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    #popup.active {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(-50%,-50%) scale(1);
-    }
   </style>
 </head>
 <body>
   <div id="loaderOverlay"><div class="spinner"></div></div>
-  <div id="popup">✅ Account created! Go back and login.</div>
 
   <div class="container">
     <h2>🌐 International Accounts</h2>
 
     <!-- LOGIN FORM -->
     <div id="loginForm">
-      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="email" id="loginEmail" placeholder="Email" required />
       <div class="password-wrapper">
-        <input type="password" id="loginPassword" placeholder="Password" required>
+        <input type="password" id="loginPassword" placeholder="Password" required />
         <span class="toggle-pass" id="toggleLoginPass">Show</span>
       </div>
       <button id="loginBtn">Login</button>
@@ -151,18 +126,15 @@
 
     <!-- SIGNUP FORM -->
     <div id="signupForm" class="hidden">
-      <input type="text" id="firstName" placeholder="First Name" required>
-      <input type="text" id="lastName" placeholder="Last Name" required>
-      <input type="email" id="signupEmail" placeholder="Email" required>
-      <input type="tel" id="phone" placeholder="Phone Number" required>
-      <input type="text" id="signupPassword" placeholder="Create Password" required>
+      <input type="text" id="firstName" placeholder="First Name" required />
+      <input type="text" id="lastName" placeholder="Last Name" required />
+      <input type="email" id="signupEmail" placeholder="Email" required />
+      <input type="tel" id="phone" placeholder="Phone Number" required />
+      <input type="text" id="signupPassword" placeholder="Create Password" required />
       <div class="strength-msg" id="passwordStrength"></div>
-      <input type="text" id="confirmPassword" placeholder="Confirm Password" required>
+      <input type="text" id="confirmPassword" placeholder="Confirm Password" required />
       <button id="signupBtn">Create Account</button>
       <div class="toggle" id="showLogin">Already have an account? Login</div>
-      
-      - - - - - - - - - - 
-    <li> NOTE: AFTER CLICKING ON (CREATE ACCOUNT) PLEASE GO BACK TO LOGIN PAGE AND ENTER YOUR NEW ACCOUNT LOGINS </li>
     </div>
 
     <div class="msg" id="message"></div>
@@ -170,21 +142,31 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      sendPasswordResetEmail 
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
+    // 🔹 Firebase Config
     const firebaseConfig = {
-      apiKey: "AIzaSyBoAbyipyqVGW5F-MX33luVmPqzbb_uVLE",
-      authDomain: "markmellon-1f7a0.firebaseapp.com",
-      databaseURL: "https://markmellon-1f7a0-default-rtdb.firebaseio.com",
-      projectId: "markmellon-1f7a0",
-      storageBucket: "markmellon-1f7a0.firebasestorage.app",
-      messagingSenderId: "191098401853",
-      appId: "1:191098401853:web:5d3ed2f18e29cad526a654",
-      measurementId: "G-9EJEJPC72Y"
+      apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+      authDomain: "markmellon-in.firebaseapp.com",
+      databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+      projectId: "markmellon-in",
+      storageBucket: "markmellon-in.firebasestorage.app",
+      messagingSenderId: "503954320627",
+      appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+      measurementId: "G-S66KTPXQPE"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -195,7 +177,13 @@
     const passwordInput = document.getElementById("signupPassword");
     const strengthMsg = document.getElementById("passwordStrength");
     const loader = document.getElementById("loaderOverlay");
-    const popup = document.getElementById("popup");
+
+    // 🔹 Redirect if user is already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
 
     // TOGGLE FORMS
     document.getElementById("showSignup").onclick = () => {
@@ -215,26 +203,19 @@
     document.getElementById("loginBtn").addEventListener("click", async () => {
       const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value.trim();
+      if (!email || !password) { msg.style.color = "yellow"; msg.textContent = "Please enter email and password."; return; }
 
-      if (!email || !password) {
-        msg.style.color = "yellow";
-        msg.textContent = "Please enter email and password.";
-        return;
-      }
-
+      loader.classList.add("active");
       try {
         await signInWithEmailAndPassword(auth, email, password);
+        loader.classList.remove("active");
         window.location.href = "index.html";
-      } catch (error) {
+      } catch (err) {
+        loader.classList.remove("active");
         msg.style.color = "yellow";
         msg.textContent = "Invalid login details.";
         forgotPasswordLink.classList.remove("hidden");
       }
-    });
-
-    // FORGOT PASSWORD
-    forgotPasswordLink.addEventListener("click", () => {
-      window.location.href = "forgot-password.html";
     });
 
     // SIGNUP USER
@@ -247,45 +228,37 @@
       const confirm = document.getElementById("confirmPassword").value;
 
       if (!first || !last || !email || !phoneNum || !pass || !confirm) {
-        msg.style.color = "yellow";
-        msg.textContent = "Please fill in all fields.";
-        return;
+        msg.style.color = "yellow"; msg.textContent = "Please fill in all fields."; return;
       }
-      if (pass !== confirm) {
-        msg.style.color = "yellow";
-        msg.textContent = "Passwords do not match!";
-        return;
-      }
+      if (pass !== confirm) { msg.style.color = "yellow"; msg.textContent = "Passwords do not match!"; return; }
 
-      loader.classList.add("active"); // show loader
-
+      loader.classList.add("active");
       try {
         const userCred = await createUserWithEmailAndPassword(auth, email, pass);
         await setDoc(doc(db, "users", userCred.user.uid), {
-          firstName: first,
-          lastName: last,
-          email: email,
-          phone: phoneNum,
-          photo: "",
-          createdAt: new Date().toISOString()
+          firstName: first, lastName: last, email: email, phone: phoneNum,
+          photo: "", createdAt: new Date().toISOString()
         });
-
-        // clear signup inputs
-        document.querySelectorAll("#signupForm input").forEach(i => i.value = "");
         loader.classList.remove("active");
-
-        // show popup
-        popup.classList.add("active");
-        setTimeout(() => {
-          popup.classList.remove("active");
-          signupForm.classList.add("hidden");
-          loginForm.classList.remove("hidden");
-        }, 3000);
-
+        window.location.href = "index.html";
       } catch (err) {
         loader.classList.remove("active");
-        msg.style.color = "yellow";
-        msg.textContent = err.message;
+        msg.style.color = "yellow"; msg.textContent = err.message;
+      }
+    });
+
+    // FORGOT PASSWORD
+    forgotPasswordLink.addEventListener("click", async () => {
+      const email = prompt("Enter your registered email:");
+      if (!email) return;
+      loader.classList.add("active");
+      try {
+        await sendPasswordResetEmail(auth, email);
+        loader.classList.remove("active");
+        msg.style.color = "lightgreen"; msg.textContent = "Password reset link sent!";
+      } catch (err) {
+        loader.classList.remove("active");
+        msg.style.color = "yellow"; msg.textContent = "Error: " + err.message;
       }
     });
 
@@ -293,13 +266,8 @@
     const loginPassInput = document.getElementById("loginPassword");
     const toggleLoginPass = document.getElementById("toggleLoginPass");
     toggleLoginPass.addEventListener("click", () => {
-      if (loginPassInput.type === "password") {
-        loginPassInput.type = "text";
-        toggleLoginPass.textContent = "Hide";
-      } else {
-        loginPassInput.type = "password";
-        toggleLoginPass.textContent = "Show";
-      }
+      if (loginPassInput.type === "password") { loginPassInput.type = "text"; toggleLoginPass.textContent = "Hide"; }
+      else { loginPassInput.type = "password"; toggleLoginPass.textContent = "Show"; }
     });
 
     // PASSWORD STRENGTH
@@ -311,18 +279,10 @@
       if (/[0-9]/.test(val)) strength++;
       if (/[^A-Za-z0-9]/.test(val)) strength++;
 
-      if (strength <= 1) {
-        strengthMsg.textContent = "Weak password";
-        strengthMsg.style.color = "red";
-      } else if (strength === 2 || strength === 3) {
-        strengthMsg.textContent = "Medium password";
-        strengthMsg.style.color = "orange";
-      } else if (strength === 4) {
-        strengthMsg.textContent = "Strong password";
-        strengthMsg.style.color = "lightgreen";
-      } else {
-        strengthMsg.textContent = "";
-      }
+      if (strength <= 1) { strengthMsg.textContent = "Weak password"; strengthMsg.style.color = "red"; }
+      else if (strength === 2 || strength === 3) { strengthMsg.textContent = "Medium password"; strengthMsg.style.color = "orange"; }
+      else if (strength === 4) { strengthMsg.textContent = "Strong password"; strengthMsg.style.color = "lightgreen"; }
+      else { strengthMsg.textContent = ""; }
     });
   </script>
 </body>
