@@ -1565,7 +1565,7 @@ function showAdminPanel(currentStatus) {
 })();
 </script>
 
-<!-- 🔹 TOP-LEFT USER PROFILE DISPLAY (Dynamic First Letter) -->
+<!-- 🔹 TOP-LEFT USER PROFILE DISPLAY -->
 <div id="profileMiniBox" style="
   position: fixed; top: 20px; left: 20px;
   background: #00b4db;
@@ -1630,15 +1630,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
+// ✅ NEW FIREBASE CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyBoAbyipyqVGW5F-MX33luVmPqzbb_uVLE",
-  authDomain: "markmellon-1f7a0.firebaseapp.com",
-  databaseURL: "https://markmellon-1f7a0-default-rtdb.firebaseio.com",
-  projectId: "markmellon-1f7a0",
-  storageBucket: "markmellon-1f7a0.firebasestorage.app",
-  messagingSenderId: "191098401853",
-  appId: "1:191098401853:web:5d3ed2f18e29cad526a654",
-  measurementId: "G-9EJEJPC72Y"
+  apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+  authDomain: "markmellon-in.firebaseapp.com",
+  databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+  projectId: "markmellon-in",
+  storageBucket: "markmellon-in.firebasestorage.app",
+  messagingSenderId: "503954320627",
+  appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+  measurementId: "G-S66KTPXQPE"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -1659,16 +1660,19 @@ const panelEnter = document.getElementById("panelEnterBtn");
 let currentUser = null;
 let panelVisible = false;
 
-// Load user data
+// ✅ Conditional redirect: only redirect if NOT logged in
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "index1.html";
+    // User not logged in, redirect to login page
+    window.location.href = "login.html";
     return;
   }
-  currentUser = user;
 
+  // User is logged in: stay on current page
+  currentUser = user;
   const docRef = doc(db, "users", user.uid);
   const docSnap = await getDoc(docRef);
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     panelFirst.value = data.firstName || "";
@@ -1722,7 +1726,7 @@ panelEnter.addEventListener("click", () => {
 // Logout
 panelLogout.addEventListener("click", async () => {
   await signOut(auth);
-  window.location.href = "index1.html";
+  window.location.href = "login.html";
 });
 </script>
 
