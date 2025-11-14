@@ -266,249 +266,119 @@
       <p>💬 Spotify Services: music Additions, listen Boosts, and Engagement.</p>
     </div>
   </section>
-  
-<script type="module">
-  /* ---------- IMPORTS ---------- */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-    signOut,
-  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  /* ---------- SUPABASE SETUP ---------- */
-  const SUPABASE_URL = "https://vdqlrnggzvezlzbrfrsp.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcWxybmdnenZlemx6YnJmcnNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA5NDQsImV4cCI6MjA3ODU0Njk0NH0.M75VVWQ46FIYvnP4_1zppmIGpUC6jG-bnF-IwMxXqJQ";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+    import { 
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      onAuthStateChanged, sendPasswordResetEmail 
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-  /* ---------- FIREBASE SETUP ---------- */
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
-    authDomain: "markmellon-in.firebaseapp.com",
-    databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
-    projectId: "markmellon-in",
-    storageBucket: "markmellon-in.appspot.com",
-    messagingSenderId: "503954320627",
-    appId: "1:503954320627:web:924dfd37dcf53af2481b86",
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+      authDomain: "markmellon-in.firebaseapp.com",
+      databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+      projectId: "markmellon-in",
+      storageBucket: "markmellon-in.firebasestorage.app",
+      messagingSenderId: "503954320627",
+      appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+      measurementId: "G-S66KTPXQPE"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
 
-  /* ---------- ELEMENTS ---------- */
-  const msg = document.getElementById("message");
-  const loader = document.getElementById("loaderOverlay");
-  const loginForm = document.getElementById("loginForm");
-  const signupForm = document.getElementById("signupForm");
-  const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    const msg = document.getElementById("message");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    const passwordInput = document.getElementById("signupPassword");
+    const strengthMsg = document.getElementById("passwordStrength");
+    const loader = document.getElementById("loaderOverlay");
 
-  /* ---------- REDIRECT IF LOGGED IN (Firebase or Supabase) ---------- */
-  async function checkLoggedInUser() {
-    const firebaseUser = auth.currentUser;
-    const { data: supaSession } = await supabase.auth.getSession();
+    onAuthStateChanged(auth, (user) => { if(user) window.location.href="index.html"; });
 
-    if (firebaseUser || supaSession.session) {
-      window.location.href = "index.html";
-    }
-  }
+    document.getElementById("showSignup").onclick = () => {
+      loginForm.classList.add("hidden");
+      signupForm.classList.remove("hidden");
+      msg.textContent = "";
+      forgotPasswordLink.classList.add("hidden");
+    };
+    document.getElementById("showLogin").onclick = () => {
+      signupForm.classList.add("hidden");
+      loginForm.classList.remove("hidden");
+      msg.textContent = "";
+      forgotPasswordLink.classList.add("hidden");
+    };
 
-  // Check on load
-  window.addEventListener("DOMContentLoaded", checkLoggedInUser);
-
-  // Also check Firebase state changes
-  onAuthStateChanged(auth, (user) => {
-    if (user) window.location.href = "index.html";
-  });
-
-  /* ---------- TOGGLE FORMS ---------- */
-  document.getElementById("showSignup").onclick = () => {
-    loginForm.classList.add("hidden");
-    signupForm.classList.remove("hidden");
-    msg.textContent = "";
-    forgotPasswordLink.classList.add("hidden");
-  };
-
-  document.getElementById("showLogin").onclick = () => {
-    signupForm.classList.add("hidden");
-    loginForm.classList.remove("hidden");
-    msg.textContent = "";
-    forgotPasswordLink.classList.add("hidden");
-  };
-
-  /* ---------- SIGNUP ---------- */
-  document.getElementById("signupBtn").addEventListener("click", async () => {
-    const first = document.getElementById("firstName").value.trim();
-    const last = document.getElementById("lastName").value.trim();
-    const email = document.getElementById("signupEmail").value.trim();
-    const phoneNum = document.getElementById("phone").value.trim();
-    const pass = document.getElementById("signupPassword").value;
-    const confirm = document.getElementById("confirmPassword").value;
-
-    if (!first || !last || !email || !phoneNum || !pass || !confirm) {
-      msg.style.color = "yellow";
-      msg.textContent = "Please fill in all fields.";
-      return;
-    }
-    if (pass !== confirm) {
-      msg.style.color = "yellow";
-      msg.textContent = "Passwords do not match!";
-      return;
-    }
-
-    loader.classList.add("active");
-
-    try {
-      // Firebase signup
-      const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-      await setDoc(doc(db, "users", userCred.user.uid), {
-        firstName: first,
-        lastName: last,
-        email,
-        phone: phoneNum,
-        createdAt: new Date().toISOString(),
-      });
-
-      // Supabase signup
-      const { data: supaUser, error: supaErr } = await supabase.auth.signUp({
-        email,
-        password: pass,
-        options: {
-          data: { first_name: first, last_name: last, phone: phoneNum },
-        },
-      });
-
-      if (supaErr) console.warn("Supabase signup error:", supaErr.message);
-
-      // Save to Supabase profiles
-      if (supaUser?.user) {
-        await supabase.from("profiles").insert([
-          {
-            id: supaUser.user.id,
-            first_name: first,
-            last_name: last,
-            email,
-            phone: phoneNum,
-            created_at: new Date().toISOString(),
-          },
-        ]);
-      }
-
-      msg.style.color = "lightgreen";
-      msg.textContent = "Account created successfully!";
-      loader.classList.remove("active");
-
-      setTimeout(() => (window.location.href = "index.html"), 1000);
-    } catch (err) {
-      loader.classList.remove("active");
-      msg.style.color = "yellow";
-      msg.textContent = "Signup failed: " + err.message;
-      console.error("Signup error:", err);
-    }
-  });
-
-  /* ---------- LOGIN ---------- */
-  document.getElementById("loginBtn").addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-
-    if (!email || !password) {
-      msg.style.color = "yellow";
-      msg.textContent = "Please enter email and password.";
-      return;
-    }
-
-    loader.classList.add("active");
-    msg.textContent = "";
-
-    try {
-      // Try Firebase first
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      if (!email || !password) { msg.style.color="yellow"; msg.textContent="Please enter email and password."; return; }
+      loader.classList.add("active");
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        msg.style.color = "lightgreen";
-        msg.textContent = "Login successful!";
+        await signInWithEmailAndPassword(auth,email,password);
         loader.classList.remove("active");
-        window.location.href = "index.html";
-        return;
-      } catch (firebaseErr) {
-        console.warn("Firebase login failed, trying Supabase...");
-      }
+        window.location.href="index.html";
+      } catch(err){ loader.classList.remove("active"); msg.style.color="yellow"; msg.textContent="Invalid login details."; forgotPasswordLink.classList.remove("hidden"); }
+    });
 
-      // Then try Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const phoneNum = document.getElementById("phone").value.trim();
+      const pass = document.getElementById("signupPassword").value;
+      const confirm = document.getElementById("confirmPassword").value;
+      if(!first||!last||!email||!phoneNum||!pass||!confirm){ msg.style.color="yellow"; msg.textContent="Please fill in all fields."; return; }
+      if(pass!==confirm){ msg.style.color="yellow"; msg.textContent="Passwords do not match!"; return; }
+      loader.classList.add("active");
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth,email,pass);
+        await setDoc(doc(db,"users",userCred.user.uid),{ firstName:first,lastName:last,email,phone:phoneNum,createdAt:new Date().toISOString() });
+        loader.classList.remove("active"); window.location.href="index.html";
+      } catch(err){ loader.classList.remove("active"); msg.style.color="yellow"; msg.textContent=err.message; }
+    });
 
-      if (error) throw error;
+    forgotPasswordLink.addEventListener("click", async () => {
+      const email = prompt("Enter your registered email:");
+      if(!email) return;
+      loader.classList.add("active");
+      try{ await sendPasswordResetEmail(auth,email); loader.classList.remove("active"); msg.style.color="lightgreen"; msg.textContent="Password reset link sent!"; }
+      catch(err){ loader.classList.remove("active"); msg.style.color="yellow"; msg.textContent="Error: "+err.message; }
+    });
 
-      msg.style.color = "lightgreen";
-      msg.textContent = "Login successful!";
-      loader.classList.remove("active");
-      window.location.href = "index.html";
-    } catch (err) {
-      loader.classList.remove("active");
-      msg.style.color = "yellow";
-      msg.textContent = "Invalid login details.";
-      forgotPasswordLink.classList.remove("hidden");
-      console.error("Login error:", err.message);
-    }
-  });
+    const loginPassInput = document.getElementById("loginPassword");
+    const toggleLoginPass = document.getElementById("toggleLoginPass");
+    toggleLoginPass.addEventListener("click", ()=>{ if(loginPassInput.type==="password"){ loginPassInput.type="text"; toggleLoginPass.textContent="Hide"; } else{ loginPassInput.type="password"; toggleLoginPass.textContent="Show"; } });
 
-  /* ---------- FORGOT PASSWORD ---------- */
-  forgotPasswordLink.addEventListener("click", async () => {
-    const email = prompt("Enter your registered email:");
-    if (!email) return;
-    loader.classList.add("active");
-    try {
-      await sendPasswordResetEmail(auth, email);
-      loader.classList.remove("active");
-      msg.style.color = "lightgreen";
-      msg.textContent = "Password reset link sent!";
-    } catch (err) {
-      loader.classList.remove("active");
-      msg.style.color = "yellow";
-      msg.textContent = "Error: " + err.message;
-    }
-  });
+    passwordInput.addEventListener("input", ()=>{
+      const val = passwordInput.value;
+      let strength = 0;
+      if(val.length>=6) strength++;
+      if(/[A-Z]/.test(val)) strength++;
+      if(/[0-9]/.test(val)) strength++;
+      if(/[^A-Za-z0-9]/.test(val)) strength++;
+      if(strength<=1){ strengthMsg.textContent="Weak password"; strengthMsg.style.color="red"; }
+      else if(strength===2||strength===3){ strengthMsg.textContent="Medium password"; strengthMsg.style.color="orange"; }
+      else if(strength===4){ strengthMsg.textContent="Strong password"; strengthMsg.style.color="lightgreen"; }
+      else{ strengthMsg.textContent=""; }
+    });
 
-  /* ---------- LOGOUT FUNCTION ---------- */
-  window.logout = async function () {
-    await Promise.all([signOut(auth), supabase.auth.signOut()]);
-    window.location.href = "login.html";
-  };
+    const ordersRef = ref(rtdb,"totalOrders");
+    onValue(ordersRef,(snapshot)=>{ const count = snapshot.exists()? snapshot.val():0; document.getElementById("ordersCount").textContent=count; });
 
-  /* ---------- PASSWORD STRENGTH INDICATOR ---------- */
-  const passwordInput = document.getElementById("signupPassword");
-  const strengthMsg = document.getElementById("passwordStrength");
-  passwordInput.addEventListener("input", () => {
-    const val = passwordInput.value;
-    let strength = 0;
-    if (val.length >= 6) strength++;
-    if (/[A-Z]/.test(val)) strength++;
-    if (/[0-9]/.test(val)) strength++;
-    if (/[^A-Za-z0-9]/.test(val)) strength++;
-    if (strength <= 1) {
-      strengthMsg.textContent = "Weak password";
-      strengthMsg.style.color = "red";
-    } else if (strength === 2 || strength === 3) {
-      strengthMsg.textContent = "Medium password";
-      strengthMsg.style.color = "orange";
-    } else if (strength === 4) {
-      strengthMsg.textContent = "Strong password";
-      strengthMsg.style.color = "lightgreen";
-    } else {
-      strengthMsg.textContent = "";
-    }
-  });
-</script>
-  
+    window.togglePanel = (id)=>{
+      document.querySelectorAll('.service-panel').forEach(p=>p.style.display="none");
+      const panel=document.getElementById(id); if(panel) panel.style.display="block";
+    };
+  </script>
   <!-- PAYMENT GATEWAY + SECURITY PARTNERS (WHITE PANEL) -->
 <section class="partners-flame-panel">
   <div class="partners-inner">
