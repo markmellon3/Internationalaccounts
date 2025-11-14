@@ -220,7 +220,7 @@ button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);ou
 
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn-cta" id="stripeBtn" onclick="startStripe()">Pay with Card</button>
-      <button class="small-btn" id="testAccountBtn" onclick="openTestAccount()">Test Account</button>
+      <button class="small-bt" id="testAccountBtn" onclick="openTestAccount()">Test Account</button>
     </div>
 
     <div style="margin-top:14px;color:var(--muted);font-size:13px">
@@ -234,7 +234,13 @@ button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);ou
 </div>
 
 <!-- === EMAIL & SOCIAL MEDIA SERVICE WIDGET === -->
+   
+<!-- === SERVICE WIDGET === -->
 <div id="serviceWidgetContainer">
+
+  <!-- === DARK OVERLAY === -->
+  <div id="overlay"></div>
+
   <!-- EMAIL CARD -->
   <div class="card">
     <h3>Email Accounts</h3>
@@ -249,59 +255,154 @@ button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);ou
     <button id="viewSocialBtn">View Services</button>
   </div>
 
-  <!-- EMAIL PANEL -->
-  <div id="emailPanel" class="panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+  <!-- EMAIL POPUP PANEL -->
+  <div id="emailPopup" class="popupPanel">
+    <div class="panelHeader">
       <h3>Email Accounts</h3>
-      <button id="closeEmailPanelBtn" class="closeBtn">×</button>
+      <button class="closeBtn" id="closeEmailPopupBtn">×</button>
     </div>
     <div id="emailList"></div>
   </div>
 
-  <!-- SOCIAL MEDIA PANEL -->
-  <div id="socialPanel" class="panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+  <!-- SOCIAL MEDIA POPUP PANEL -->
+  <div id="socialPopup" class="popupPanel">
+    <div class="panelHeader">
       <h3>Social Media Services</h3>
-      <button id="closeSocialPanelBtn" class="closeBtn">×</button>
+      <button class="closeBtn" id="closeSocialPopupBtn">×</button>
     </div>
-    <div style="display:flex; margin-bottom:1rem;">
+
+    <div class="tabs">
       <button id="tiktokTab" class="tab active">TikTok</button>
       <button id="instagramTab" class="tab">Instagram</button>
     </div>
+
     <div id="socialList"></div>
   </div>
 </div>
 
 <style>
-/* General styling */
-#serviceWidgetContainer * { box-sizing:border-box; font-family:'Poppins', sans-serif; }
-#serviceWidgetContainer .card { background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin:1rem; }
-#serviceWidgetContainer .card h3 { margin-top:0; }
-#serviceWidgetContainer .card button { border:none; padding:10px 16px; border-radius:8px; cursor:pointer; }
-#serviceWidgetContainer #viewEmailsBtn { background:#0a84ff; color:#fff; }
-#serviceWidgetContainer #viewSocialBtn { background:#ff2d55; color:#fff; }
-
-/* Panels */
-#serviceWidgetContainer .panel {
-  position:fixed; top:0; right:-100%; width:360px; height:100%; background:#fff;
-  box-shadow:-2px 0 8px rgba(0,0,0,0.2); transition:right 0.3s ease; z-index:10000; padding:1rem; overflow-y:auto;
+/* BASIC */
+#serviceWidgetContainer * {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
-#serviceWidgetContainer .panel h3 { margin-top:0; }
-#serviceWidgetContainer .panel button.closeBtn { background:none; border:none; font-size:20px; cursor:pointer; }
+
+.card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 1rem;
+}
+
+.card button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+}
+
+#viewEmailsBtn { background:#0a84ff; }
+#viewSocialBtn { background:#ff2d55; }
+
+/* DARK OVERLAY */
+#overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s ease;
+  z-index: 9998;
+}
+
+/* CENTER POPUP */
+.popupPanel {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 380px;
+  max-height: 80%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  z-index: 10000;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  overflow-y: auto;
+}
+
+/* Show popup */
+.popupPanel.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Panel Header */
+.panelHeader {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1rem;
+}
+
+.closeBtn {
+  border:none;
+  background:none;
+  font-size:22px;
+  cursor:pointer;
+}
 
 /* Tabs */
-#serviceWidgetContainer .tab { flex:1; padding:8px; border:none; cursor:pointer; }
-#serviceWidgetContainer .tab.active { background:#ff2d55; color:#fff; }
+.tabs { display:flex; margin-bottom:1rem; }
+.tab {
+  flex:1; padding:8px;
+  border:none; cursor:pointer;
+  background:#eee;
+}
+.tab.active {
+  background:#ff2d55;
+  color:#fff;
+}
 
-/* Quick buttons and inputs */
-#serviceWidgetContainer .quickBtn { margin:2px; padding:4px 8px; border:none; background:#0a84ff; color:#fff; border-radius:4px; cursor:pointer; }
-#serviceWidgetContainer .quantitySelect, #serviceWidgetContainer .accountInput { padding:6px; margin-bottom:6px; border:1px solid #ccc; border-radius:4px; width:100%; }
+/* Inputs & Quick Buttons */
+.quickBtn {
+  margin:2px; padding:4px 8px;
+  border:none; border-radius:4px;
+  background:#0a84ff; color:#fff;
+  cursor:pointer;
+}
+
+.quantitySelect, .accountInput {
+  width:100%; padding:6px;
+  border:1px solid #ccc; border-radius:4px;
+  margin-bottom:6px;
+}
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const container = document.getElementById('serviceWidgetContainer');
+document.addEventListener("DOMContentLoaded", () => {
 
+  const overlay = document.getElementById("overlay");
+
+  /* PANELS */
+  const emailPopup = document.getElementById("emailPopup");
+  const socialPopup = document.getElementById("socialPopup");
+
+  const viewEmailsBtn = document.getElementById("viewEmailsBtn");
+  const viewSocialBtn = document.getElementById("viewSocialBtn");
+
+  const closeEmailPopupBtn = document.getElementById("closeEmailPopupBtn");
+  const closeSocialPopupBtn = document.getElementById("closeSocialPopupBtn");
+
+  /* ==============================
+       FULL EMAIL LIST RESTORED
+  ============================== */
   const emails = [
     { name: "travelhub@gmail.com", country: "US", price: 1, paymentPage: "email-payment.html" },
     { name: "luxurybrand@mail.com", country: "UK", price: 1, paymentPage: "email-payment.html" },
@@ -315,116 +416,167 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: "festylezone@mail.com", country: "ZA", price: 1, paymentPage: "email-payment.html" }
   ];
 
+  const emailList = document.getElementById("emailList");
+  emailList.innerHTML = "";
+
+  emails.forEach(e => {
+    const div = document.createElement("div");
+    div.style = "display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;";
+
+    div.innerHTML = `
+      <div>
+        <strong>${e.name}</strong><br>
+        <small>${e.country}</small><br>
+        <span style="color:#0a84ff; font-weight:600;">$${e.price}</span>
+      </div>
+      <button style="background:#0a84ff; color:#fff; padding:6px 10px; border-radius:6px;">Select</button>
+    `;
+
+    div.querySelector("button").onclick = () => {
+      window.location.href =
+        `${e.paymentPage}?email=${encodeURIComponent(e.name)}&price=${e.price}`;
+    };
+
+    emailList.appendChild(div);
+  });
+
+  /* ===========================
+        SOCIAL SERVICES
+  ============================ */
   const socialServices = {
     TikTok: [
-      { name: "Followers", pricePerThousand: 4, paymentPage: "social-payment.html" },
-      { name: "Likes", pricePerThousand: 2, paymentPage: "social-payment.html" }
+      { name:"Followers", pricePerThousand:4 },
+      { name:"Likes", pricePerThousand:2 }
     ],
     Instagram: [
-      { name: "Followers", pricePerThousand: 8, paymentPage: "social-payment.html" },
-      { name: "Likes", pricePerThousand: 2, paymentPage: "social-payment.html" }
+      { name:"Followers", pricePerThousand:8 },
+      { name:"Likes", pricePerThousand:2 }
     ]
   };
 
-  const quantityOptions = []; 
-  for (let i = 1000; i <= 1000000; i+=1000) quantityOptions.push(i);
+  const quantityOptions = [];
+  for (let i = 1000; i <= 500000; i += 1000) quantityOptions.push(i);
   const quickQuantities = [1000,5000,10000,50000,100000];
 
-  // === EMAIL PANEL ===
-  const emailListContainer = container.querySelector('#emailList');
-  emails.forEach(email => {
-    const div = document.createElement('div');
-    div.style = "display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:8px; border-bottom:1px solid #eee;";
-    div.innerHTML = `
-      <div>
-        <strong>${email.name}</strong><br>
-        <small>${email.country}</small><br>
-        <span style="color:#0a84ff; font-weight:600;">$${email.price}</span>
-      </div>
-      <button style="background:#0a84ff; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">Select</button>
-    `;
-    const btn = div.querySelector('button');
-    btn.addEventListener('click',()=> {
-      window.location.href = `${email.paymentPage}?email=${encodeURIComponent(email.name)}&price=${email.price}`;
-    });
-    emailListContainer.appendChild(div);
-  });
+  const socialList = document.getElementById("socialList");
 
-  // === SOCIAL PANEL ===
-  const socialListContainer = container.querySelector('#socialList');
-  function loadSocialServices(platform){
-    socialListContainer.innerHTML = '';
-    socialServices[platform].forEach(service=>{
-      const div = document.createElement('div');
-      div.style = "display:flex; flex-direction:column; margin-bottom:15px; padding:8px; border-bottom:1px solid #eee; border-radius:6px;";
+  function loadSocial(platform){
+    socialList.innerHTML = "";
+    socialServices[platform].forEach(s => {
 
-      const quickButtonsHTML = quickQuantities.map(q => `<button class="quickBtn" data-value="${q}">${q}</button>`).join('');
+      const div = document.createElement("div");
+      div.style = "padding:10px; border-bottom:1px solid #eee;";
+
+      const quickBtns = quickQuantities
+        .map(q => `<button class="quickBtn" data-q="${q}">${q}</button>`)
+        .join("");
+
       div.innerHTML = `
-        <div style="margin-bottom:6px;">
-          <strong>${service.name}</strong> - <small>${platform}</small><br>
-          <span style="color:#ff2d55; font-weight:600;">$${service.pricePerThousand} per 1000 ${service.name.toLowerCase()}</span>
-        </div>
-        <div style="display:flex; flex-direction:column;">
-          <div style="margin-bottom:6px;">Quick quantities: ${quickButtonsHTML}</div>
-          <select class="quantitySelect"><option value="">Select quantity</option>${quantityOptions.map(q=>`<option value="${q}">${q}</option>`).join('')}</select>
-          <input type="text" placeholder="Enter your account link" class="accountInput"/>
-          <div style="margin-bottom:6px; font-weight:bold; color:#ff2d55;">Total: $<span class="totalPrice">0</span></div>
-          <button style="background:#ff2d55; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">Select</button>
-        </div>
+        <strong>${s.name}</strong> - <small>${platform}</small><br>
+        <span style="color:#ff2d55;">$${s.pricePerThousand} per 1000</span><br><br>
+
+        Quick: ${quickBtns}<br><br>
+
+        <select class="quantitySelect">
+          <option value="">Select quantity</option>
+          ${quantityOptions.map(q => `<option value="${q}">${q}</option>`)}
+        </select>
+
+        <input type="text" class="accountInput" placeholder="Enter your account link">
+
+        <div>Total: $<span class="totalPrice">0</span></div>
+
+        <button class="buyBtn" style="background:#ff2d55; color:white; padding:6px 10px; border-radius:6px; margin-top:6px;">Select</button>
       `;
-      socialListContainer.appendChild(div);
 
-      const quantitySelect = div.querySelector('.quantitySelect');
-      const accountInput = div.querySelector('.accountInput');
-      const totalPriceEl = div.querySelector('.totalPrice');
-      const selectBtn = div.querySelector('button');
-      const quickBtns = div.querySelectorAll('.quickBtn');
+      socialList.appendChild(div);
 
-      quickBtns.forEach(btn => {
-        btn.addEventListener('click',()=> {
-          const value = parseInt(btn.dataset.value);
-          quantitySelect.value = value;
-          totalPriceEl.textContent = ((value/1000)*service.pricePerThousand).toFixed(2);
-        });
+      const qtySelect = div.querySelector(".quantitySelect");
+      const totalEl = div.querySelector(".totalPrice");
+      const accountInput = div.querySelector(".accountInput");
+      const quickBtnEls = div.querySelectorAll(".quickBtn");
+
+      function updateTotal(){
+        const qty = parseInt(qtySelect.value || 0);
+        totalEl.textContent = ((qty/1000)*s.pricePerThousand).toFixed(2);
+      }
+
+      qtySelect.onchange = updateTotal;
+
+      quickBtnEls.forEach(btn => {
+        btn.onclick = () => {
+          qtySelect.value = btn.dataset.q;
+          updateTotal();
+        };
       });
 
-      quantitySelect.addEventListener('change',()=>{
-        const qty = parseInt(quantitySelect.value)||0;
-        totalPriceEl.textContent = ((qty/1000)*service.pricePerThousand).toFixed(2);
-      });
-
-      selectBtn.addEventListener('click',()=>{
-        const qty = parseInt(quantitySelect.value);
+      div.querySelector(".buyBtn").onclick = () => {
+        const qty = qtySelect.value;
         const account = accountInput.value.trim();
-        if(!qty){alert("Please select a quantity."); return;}
-        if(!account){alert("Please enter your account link."); return;}
-        const total = ((qty/1000)*service.pricePerThousand).toFixed(2);
-        window.location.href = `${service.paymentPage}?service=${encodeURIComponent(service.name)}&platform=${platform}&quantity=${qty}&account=${encodeURIComponent(account)}&total=${total}`;
-      });
+        const total = totalEl.textContent;
+
+        if (!qty) return alert("Select quantity");
+        if (!account) return alert("Enter account link");
+
+        window.location.href =
+          `social-payment.html?platform=${platform}&service=${s.name}&qty=${qty}&account=${encodeURIComponent(account)}&total=${total}`;
+      };
     });
   }
 
-  loadSocialServices('TikTok');
+  loadSocial("TikTok");
 
-  // === TAB SWITCH ===
-  container.querySelector('#tiktokTab').addEventListener('click',()=>{
-    loadSocialServices('TikTok');
-    container.querySelector('#tiktokTab').classList.add('active');
-    container.querySelector('#instagramTab').classList.remove('active');
-  });
-  container.querySelector('#instagramTab').addEventListener('click',()=>{
-    loadSocialServices('Instagram');
-    container.querySelector('#instagramTab').classList.add('active');
-    container.querySelector('#tiktokTab').classList.remove('active');
-  });
+  document.getElementById("tiktokTab").onclick = () => {
+    loadSocial("TikTok");
+    document.getElementById("tiktokTab").classList.add("active");
+    document.getElementById("instagramTab").classList.remove("active");
+  };
 
-  // === OPEN/CLOSE PANELS ===
-  container.querySelector('#viewEmailsBtn').addEventListener('click',()=>{container.querySelector('#emailPanel').style.right='0';});
-  container.querySelector('#viewSocialBtn').addEventListener('click',()=>{container.querySelector('#socialPanel').style.right='0';});
-  container.querySelector('#closeEmailPanelBtn').addEventListener('click',()=>{container.querySelector('#emailPanel').style.right='-100%';});
-  container.querySelector('#closeSocialPanelBtn').addEventListener('click',()=>{container.querySelector('#socialPanel').style.right='-100%';});
+  document.getElementById("instagramTab").onclick = () => {
+    loadSocial("Instagram");
+    document.getElementById("instagramTab").classList.add("active");
+    document.getElementById("tiktokTab").classList.remove("active");
+  };
+
+  /* ===========================
+      OPEN / CLOSE PANELS
+  ============================ */
+
+  viewEmailsBtn.onclick = () => {
+    emailPopup.classList.add("active");
+    overlay.style.opacity = "1";
+    overlay.style.pointerEvents = "auto";
+  };
+
+  closeEmailPopupBtn.onclick = () => {
+    emailPopup.classList.remove("active");
+    overlay.style.opacity = "0";
+    overlay.style.pointerEvents = "none";
+  };
+
+  viewSocialBtn.onclick = () => {
+    socialPopup.classList.add("active");
+    overlay.style.opacity = "1";
+    overlay.style.pointerEvents = "auto";
+  };
+
+  closeSocialPopupBtn.onclick = () => {
+    socialPopup.classList.remove("active");
+    overlay.style.opacity = "0";
+    overlay.style.pointerEvents = "none";
+  };
+
+  /* CLICKING OVERLAY CLOSES EVERYTHING */
+  overlay.onclick = () => {
+    emailPopup.classList.remove("active");
+    socialPopup.classList.remove("active");
+    overlay.style.opacity = "0";
+    overlay.style.pointerEvents = "none";
+  };
+
 });
 </script>
+
 
 <footer style="text-align:center;padding:34px 0;color:var(--muted)">
   © <span id="year"></span> Account Approval Request 
@@ -435,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
    SOCIALACCOUNTS MARKETPLACE
    ========================= */
 // === SPOTIFY (6) ===
-const STORE = [
+cont STORE = [
   
    // === account1 ===
   { id:'spotify-lofi-1000k', title:'Spotify -Lofi Beats (NEWEST)', platform:'Spotify', followers:1000, lang:'Instrumental', country:'United States', price:10, seller:'ChillZone', excerpt:'Calm instrumental playlist with 1M+ monthly plays.', link:'https://open.spotify.com/user/31d3fwxpajdyei62fzj4l2c7xujq?si=l1Cuweu7QRiQAGhHxyBb7A',  paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73"},
