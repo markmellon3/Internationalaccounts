@@ -220,7 +220,7 @@ button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);ou
 
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn-cta" id="stripeBtn" onclick="startStripe()">Pay with Card</button>
-      <button class="small-bt" id="testAccountBtn" onclick="openTestAccount()">Test Account</button>
+      <button class="small-btn" id="testAccountBtn" onclick="openTestAccount()">Test Account</button>
     </div>
 
     <div style="margin-top:14px;color:var(--muted);font-size:13px">
@@ -233,8 +233,6 @@ button:focus,input:focus,select:focus{outline:3px solid rgba(10,132,255,0.12);ou
   </div>
 </div>
 
-<!-- === EMAIL & SOCIAL MEDIA SERVICE WIDGET === -->
-   
 <!-- === SERVICE WIDGET === -->
 <div id="serviceWidgetContainer">
 
@@ -577,7 +575,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
 <footer style="text-align:center;padding:34px 0;color:var(--muted)">
   © <span id="year"></span> Account Approval Request 
 </footer>
@@ -587,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
    SOCIALACCOUNTS MARKETPLACE
    ========================= */
 // === SPOTIFY (6) ===
-cont STORE = [
+const STORE = [
   
    // === account1 ===
   { id:'spotify-lofi-1000k', title:'Spotify -Lofi Beats (NEWEST)', platform:'Spotify', followers:1000, lang:'Instrumental', country:'United States', price:10, seller:'ChillZone', excerpt:'Calm instrumental playlist with 1M+ monthly plays.', link:'https://open.spotify.com/user/31d3fwxpajdyei62fzj4l2c7xujq?si=l1Cuweu7QRiQAGhHxyBb7A',  paymentLink: "https://payments.munopay.com/pay?id=11c4c120f2e9ce73"},
@@ -640,52 +637,48 @@ cont STORE = [
     // === TIKTOK (9) ===
     
     // === account1 ===
-  { id:'tiktok-1000k', title:'TikTok —  (NEWEST)', platform:'TikTok', followers:1000, lang:'English', country:'UNITED STATES ', price:4, seller:'MM-INDUSTRY ', excerpt:'Supports live stream & strong fyp reach.', link:'under-construction.html',paymentLink: "paymentURL"},
- 
+  { id:'tiktok-1000k', title:'TikTok —  (NEWEST)', platform:'TikTok', followers:1000, lang:'English', country:'UNITED STATES ', price:7, seller:'MM-INDUSTRY ', excerpt:'Supports live stream & strong fyp reach.', link:'https://www.tiktok.com/@happiness.009?_r=1&_t=ZM-916PzxkSVbw' },
   
   // === account2 ===
-  { id:'tiktok-2000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:2000, lang:'English', country:'UNITED KINGDOM ', price:6, seller:'GrooveNation', excerpt:'Trendy Supports live stream & strong fyp reach .', link:'under-construction.html',paymentLink: "paymentURL"},
-  
+  { id:'tiktok-2000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:2000, lang:'English', country:'UNITED KINGDOM ', price:10, seller:'GrooveNation', excerpt:'Trendy Supports live stream & strong fyp reach .', link:'https://socialaccounts.test/demo/tiktok-dance-400k' },
   
   // === account2 ===
-  { id:'tiktok-3000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:3000, lang:'English', country:'UNITED STATES', price:8, seller:'JokeStream', excerpt:'Supports live stream & strong fyp reach.', link:'under-construction.html',paymentLink: "paymentURL"},
-   
+  { id:'tiktok-3000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:3000, lang:'English', country:'UNITED STATES', price:12, seller:'JokeStream', excerpt:'Supports live stream & strong fyp reach.', link:'https://socialaccounts.test/demo/tiktok-pranks-90k' },
   
   // === account3 ===
-  { id:'tiktok-4000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:4000, lang:'English', country:'UNITED STATES ', price:10, seller:'TastyTrail', excerpt:'Supports live stream & viral mega views fyp .', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'tiktok-4000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:4000, lang:'English', country:'UNITED STATES ', price:13, seller:'TastyTrail', excerpt:'Supports live stream & viral mega views fyp .', link:'https://socialaccounts.test/demo/tiktok-food-150k' },
   
   // === account4 ===
-  { id:'tiktok-5000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:5000, lang:'English', country:'EUROPE ', price:14, seller:'GameZone', excerpt:'High live stream view count & strong fyp.', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'tiktok-5000', title:'TikTok — (NEWEST)', platform:'TikTok', followers:5000, lang:'English', country:'EUROPE ', price:15, seller:'GameZone', excerpt:'High live stream view count & strong fyp.', link:'https://socialaccounts.test/demo/tiktok-gaming-250k' },
   
   // === account5 ===
-  { id:'tiktok-fashion-10000', title:'TikTok — (VERIFIED)', platform:'TikTok', followers:6000, lang:'English', country:'EUROPE', price:16, seller:'StyleWave', excerpt:'Fashion & style high market ordinance/live stream .', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'tiktok-fashion-10000', title:'TikTok — (VERIFIED)', platform:'TikTok', followers:6000, lang:'English', country:'EUROPE', price:16, seller:'StyleWave', excerpt:'Fashion & style high market ordinance/live stream .', link:'https://socialaccounts.test/demo/tiktok-fashion-70k' },
   
   // === account6 ===
-  { id:'tiktok-travel-300k', title:'TikTok — Travel Vlogs (300k)', platform:'TikTok', followers:300000, lang:'English', country:'TH', price:2100, seller:'WanderWorld', excerpt:'Adventure travel & cinematic vlogs.', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'tiktok-travel-300k', title:'TikTok — Travel Vlogs (300k)', platform:'TikTok', followers:300000, lang:'English', country:'TH', price:2100, seller:'WanderWorld', excerpt:'Adventure travel & cinematic vlogs.', link:'https://socialaccounts.test/demo/tiktok-travel-300k' },
   
   // === account7 ===
-  { id:'tiktok-edu-180k', title:'TikTok — Educational (180k)', platform:'TikTok', followers:180000, lang:'English', country:'US', price:1250, seller:'SmartTips', excerpt:'Quick learning & productivity.', link:'under-construction.html', paymentLink: "paymentURL"},
+  { id:'tiktok-edu-180k', title:'TikTok — Educational (180k)', platform:'TikTok', followers:180000, lang:'English', country:'US', price:1250, seller:'SmartTips', excerpt:'Quick learning & productivity hacks.', link:'https://socialaccounts.test/demo/tiktok-edu-180k' },
   
   // === account8 ===
-  { id:'tiktok-relationship-60k', title:'TikTok — Relationship Talks (PRE-ORDER)', platform:'TikTok', followers:60000, lang:'English', country:'NG', price:300, seller:'HeartTalks', excerpt:'Daily advice on love and motivation.', link:'under-construction.html', paymentLink: "paymentURL"},
+  { id:'tiktok-relationship-60k', title:'TikTok — Relationship Talks (PRE-ORDER)', platform:'TikTok', followers:60000, lang:'English', country:'NG', price:300, seller:'HeartTalks', excerpt:'Daily advice on love and motivation.', link:'https://socialaccounts.test/demo/tiktok-relationship-60k' },
   
   // === account9 ===
-  { id:'tiktok-tech-1M', title:'TikTok — Tech Reviews (PRE-ORDER)', platform:'TikTok', followers:1000000, lang:'English', country:'US', price:2700, seller:'TechByte', excerpt:'Gadget reviews & unboxings.', link:'under-construction-html', paymentLink: "paymentURL"},
+  { id:'tiktok-tech-1M', title:'TikTok — Tech Reviews (PRE-ORDER)', platform:'TikTok', followers:1000000, lang:'English', country:'US', price:2700, seller:'TechByte', excerpt:'Gadget reviews & unboxings.', link:'https://socialaccounts.test/demo/tiktok-tech-500k' },
   
   // === account10 ===
-  { id:'tiktok-Account1-1000k', title:'TikTok — account1-(1000k)', platform:'TikTok', followers:500000, lang:'Spanish', country:'United States', price:2000, seller:'LaughsCo', excerpt:'Viral sketches & organic reach.', link:'under-construction.html',paymentLink: "paymentURL"},
-  
+  { id:'tiktok-Account1-1000k', title:'TikTok — account1-(1000k)', platform:'TikTok', followers:500000, lang:'Spanish', country:'United States', price:2000, seller:'LaughsCo', excerpt:'Viral sketches & strong organic reach.', link:'https://www.tiktok.com/@quinerror?_r=1&_t=ZM-916PtwZwEtX' },
   
   // === YOUTUBE (7) ===
   
   // === account1 ===
-  { id:'yt-tech-1000k', title:'YouTube — Tech Channel (NEW)', platform:'YouTube', followers:1000, lang:'English', country:'US', price:30, seller:'TechMinded', excerpt:'Engaged tech followers and beginners account for content.', link:'under-construction.html',paymentLink: "paymentURL"}, 
+  { id:'yt-tech-15k', title:'YouTube — Tech Channel (15k)', platform:'YouTube', followers:15000, lang:'English', country:'US', price:620, seller:'TechMinded', excerpt:'Engaged tech followers and niche content.', link:'https://socialaccounts.test/demo/yt-tech-15k' },
   
   // === account1 ===
-  { id:'yt-vlog-500', title:'YouTube — Lifestyle Vlogger (NEW)', platform:'YouTube', followers:500, lang:'English', country:'US', price:18, seller:'LifeMoments', excerpt:'Daily lifestyle .', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'yt-vlog-40k', title:'YouTube — Lifestyle Vlogger (40k)', platform:'YouTube', followers:40000, lang:'English', country:'US', price:890, seller:'LifeMoments', excerpt:'Daily lifestyle & travel vlogs.', link:'https://socialaccounts.test/demo/yt-vlog-40k' },
   
   // === account2 ===
-  { id:'yt-gaming-2000', title:'YouTube — Gaming Channel (200k)', platform:'YouTube', followers:2000, lang:'English', country:'US', price:37, seller:'ProGamer', excerpt:'Gameplays and live streams.', link:'under-construction.html',paymentLink: "paymentURL"},
+  { id:'yt-gaming-200k', title:'YouTube — Gaming Channel (200k)', platform:'YouTube', followers:200000, lang:'English', country:'US', price:2100, seller:'ProGamer', excerpt:'Gameplays and live streams.', link:'https://socialaccounts.test/demo/yt-gaming-200k' },
   
   // === account3 ===
   { id:'yt-cooking-80k', title:'YouTube — Cooking Channel (80k)', platform:'YouTube', followers:80000, lang:'English', country:'IN', price:970, seller:'HomeChef', excerpt:'Tasty and easy recipes.', link:'https://socialaccounts.test/demo/yt-cooking-80k' },
@@ -884,14 +877,14 @@ document.getElementById('year').textContent = new Date().getFullYear();
       <ul>
         <li>🚀 New updated accounts Launching Soon</li>
         <li>🌱 Upgraded accounts 99% </li>
-        <li>🤝 Please switch to disktop mode for better view</li>
+        <li>🤝 Partnership Opportunities Open — Join Us</li>
       </ul>
     </div>
 
     <!-- Security reCAPTCHA -->
     <div class="captcha-section">
       <p>Please verify you’re not a robot:</p>
-      <div class="g-recaptcha" data-sitekey="6LfXBAgsAAAAAIZQJY8isH9PlPKQBm6vVhzgH_QD" data-callback="enableContinue"></div>
+      <div class="g-recaptcha" data-sitekey="6LfXBAgsAAAAAIZQJY8isH9PlPKQBm6vVhzgH_QD " data-callback="enableContinue"></div>
     </div>
 
     <!-- Buttons -->
@@ -1717,6 +1710,7 @@ function showAdminPanel(currentStatus) {
 })();
 </script>
 
+
 <!-- 🔹 TOP-LEFT USER PROFILE DISPLAY -->
 <div id="profileMiniBox" style="
   position: fixed; top: 20px; left: 20px;
@@ -1939,6 +1933,31 @@ panelLogout.addEventListener("click", async () => {
     }
   });
 </script>
+<!-- FIREBASE PERFORMANCE MONITORING -->
+<script type="module">
+  // Import Firebase modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import { getPerformance } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-performance.js";
 
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzxCaVcodoTS7C8P166NGsLzV-uMkcwYw",
+    authDomain: "markmellon-in.firebaseapp.com",
+    databaseURL: "https://markmellon-in-default-rtdb.firebaseio.com",
+    projectId: "markmellon-in",
+    storageBucket: "markmellon-in.appspot.com",
+    messagingSenderId: "503954320627",
+    appId: "1:503954320627:web:924dfd37dcf53af2481b86",
+    measurementId: "G-S66KTPXQPE"
+  };
+
+  // Initialize Firebase App
+  const app = initializeApp(firebaseConfig);
+
+  // Initialize Performance Monitoring
+  const perf = getPerformance(app);
+
+  console.log("Firebase Performance Monitoring initialized:", perf);
+</script>
 </body>
 </html>
